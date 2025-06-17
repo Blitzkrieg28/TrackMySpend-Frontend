@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { HiEyeOff,HiEye } from "react-icons/hi";
-export function PasswordInput(){
-         const [password,setPassword]= useState("");
+export function PasswordInput({password,setPassword}){
          const [touched,setTouched]= useState(false);
 const [showPassword, setShowPassword] = useState(false);
 
