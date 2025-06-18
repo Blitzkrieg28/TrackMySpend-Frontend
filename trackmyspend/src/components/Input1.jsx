@@ -7,7 +7,7 @@ import { Button } from "./Button";
 import { NameInput } from "./NameInput";
 import { ConfirmPasswordInput } from "./ConfirmPassword";
 
-export default function Input1() {
+export default function Input1({onGetStarted}) {
     const [password,setPassword]= useState("");
 
   return (
@@ -18,7 +18,7 @@ export default function Input1() {
       <ConfirmPasswordInput password={password} />
 
       <div className="pt-2 pb-6 font-segoe">Already Registered? <Link to="/signin">Click Here!</Link> </div>
-      <Button label="Signup"/>
+      <Button label="Signup" trynow={onGetStarted}/>
     </div>
   );
 }

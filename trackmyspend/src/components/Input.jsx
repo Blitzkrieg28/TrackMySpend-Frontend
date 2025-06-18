@@ -5,7 +5,7 @@ import { PasswordInput } from "./PasswordInput";
 import { Link } from "react-router-dom";
 import { Button } from "./Button";
 
-export default function Input() {
+export default function Input({getstarted}) {
       const [password,setPassword]= useState("");
 
   return (
@@ -13,7 +13,7 @@ export default function Input() {
       <EmailInput/>
       <PasswordInput password={password} setPassword={setPassword}/>
       <div className="pt-2 pb-6 font-segoe">Not Registered yet? <Link to="/signup">Click Here!</Link> </div>
-      <Button label="Signin"/>
+      <Button label="Signin" trynow={getstarted}/>
     </div>
   );
 }

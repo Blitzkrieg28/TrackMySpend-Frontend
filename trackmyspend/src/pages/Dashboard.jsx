@@ -9,6 +9,7 @@ import { Button } from "../components/Button";
 
 function Dashboard() {
  
+  
   return (
    <div className="min-h-screen flex flex-col bg-[#e8e8e8] dark:bg-customDarkBlue text-customIndigoDark dark:text-custom1Blue transition-all">
   

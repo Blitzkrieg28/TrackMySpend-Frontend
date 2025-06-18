@@ -1,7 +1,6 @@
 // App.jsx
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Dashboard from "./pages/Dashboard";
 import logo from "./assets/budgeting.gif";
 import { lazy, useEffect, useState,Suspense } from "react";
 import { AnimatedHeading } from "./components/AnimatedHeading";
@@ -10,7 +9,7 @@ import Splash from "./components/SplashScreen";
 const Landing= lazy(() => import('./pages/Landing'));
 const Signin= lazy(() => import('./pages/Signin'));
 const Signup= lazy(() => import('./pages/Signup'));
-
+const Dashboard= lazy(()=> import('./pages/Dashboard'));
 
 function App() {
  
@@ -36,7 +35,7 @@ function App() {
   <>
   <BrowserRouter>
     <Routes>
-       <Route path="/dashboard" element={<Dashboard/>}></Route>
+       <Route path="/dashboard" element={<Suspense fallback={<Splash/>}><Dashboard/></Suspense>}></Route>
         <Route path="/" element={<Suspense fallback={<Splash />}><Landing /></Suspense>}/> 
         <Route path="/signin" element={<Suspense fallback={<Splash />}><Signin/></Suspense>}></Route>
         <Route path="/signup" element={<Suspense fallback={<Splash/>}><Signup/></Suspense>}></Route>  
