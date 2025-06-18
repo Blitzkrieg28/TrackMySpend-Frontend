@@ -6,12 +6,27 @@ import ThemeToggle from "../components/Themetoggle";
 import Input from "../components/Input";
 import LineGraph from "../components/line";
 import { Button } from "../components/Button";
+import { useNavigate } from "react-router-dom";
+import Splash from "../components/SplashScreen";
 
 function Dashboard() {
- 
+  const [showSplash,setShowSplash]= useState(false);
+
+  const navigate= useNavigate();
+const handlestart5 = (link) => {
+  setShowSplash(true);       
+
+  setTimeout(() => {
+    navigate(link);       
+  }, 3000);
+};
   
+
+  
+
+  if(showSplash) return <Splash/>
   return (
-   <div className="min-h-screen flex flex-col bg-[#e8e8e8] dark:bg-customDarkBlue text-customIndigoDark dark:text-custom1Blue transition-all">
+   <div className="min-h-screen flex flex-col bg-[#e8e8e8] dark:bg-customDarkBlue text-customIndigoDark font-segoe dark:text-custom1Blue transition-all">
   
   {/* Navbar at top */}
   <NavbarComponent />
@@ -20,7 +35,7 @@ function Dashboard() {
   <div className="flex">
     
     {/* Sidebar */}
-    <Component />
+<Component getstarted={handlestart5} />
 
     {/* Main Content Area */}
     <main className="flex-2 p-6">

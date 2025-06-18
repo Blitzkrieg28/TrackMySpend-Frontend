@@ -10,33 +10,40 @@ import {
   HiTable,
 } from "react-icons/hi";
 import { BiBuoy } from "react-icons/bi";
+import { Link, useNavigate } from "react-router-dom";
+import Splash from "./SplashScreen";
 
-export default function SidebarComponent() {
-  const [collapsed, setCollapsed] = useState(false);
-
+export default function SidebarComponent({getstarted}) {
+  const [collapsed, setCollapsed] = useState(true);
+  
+  
   return (
     <aside
       className={`h-screen transition-all duration-300 ${
         collapsed ? "w-16" : "w-64"
-      } bg-customBlack text-!customLavender shadow-lg`}
+      } bg-[#ffffff]  dark:bg-customBlack shadow-lg `}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-700 bg-[#ffffff] text-!customLavender">
+      <div className="flex items-center justify-start p-4 border-b border-gray-700 bg-[#ffffff] dark:bg-customBlack dark:text-customLavender gap-4">
         <button onClick={() => setCollapsed(!collapsed)}>
           <HiMenu className="w-6 h-6" />
         </button>
+        <div className="font-segoe">
+            {collapsed ? "" : "Menu"}
+        </div>
         
       </div>
 
       {/* Menu */}
       <nav className="flex flex-col px-2 py-4 space-y-2 text-sm">
-        <SidebarLink icon={HiChartPie} label="Dashboard" collapsed={collapsed} />
-        <SidebarLink icon={HiViewBoards} label="Income" collapsed={collapsed} />
-        <SidebarLink icon={HiInbox} label="Expense" collapsed={collapsed} />
-        <SidebarLink icon={HiUser} label="Budget" collapsed={collapsed} />
-        <SidebarLink icon={HiShoppingBag} label="Report" collapsed={collapsed} />
-        <SidebarLink icon={HiArrowSmRight} label="Sign In" collapsed={collapsed} />
-        <SidebarLink icon={HiTable} label="Sign Up" collapsed={collapsed} />
+        
+        <SidebarLink href="/dashboard" icon={HiChartPie} label="Dashboard" collapsed={collapsed} />
+        <SidebarLink  link= "/income" onClick ={getstarted} icon={HiViewBoards} label="Income" collapsed={collapsed} />
+        <SidebarLink  href="#" icon={HiInbox} label="Expense" collapsed={collapsed} />
+        <SidebarLink href="#" icon={HiUser} label="Budget" collapsed={collapsed} />
+        <SidebarLink href="#" icon={HiShoppingBag} label="Report" collapsed={collapsed} />
+        <SidebarLink href="#" icon={HiArrowSmRight} label="Sign In" collapsed={collapsed} />
+        <SidebarLink href="#" icon={HiTable} label="Sign Up" collapsed={collapsed} />
 
         <div className="border-t border-gray-700 pt-4">
           <SidebarLink icon={HiChartPie} label="Upgrade to Pro" collapsed={collapsed} />
@@ -47,14 +54,14 @@ export default function SidebarComponent() {
   );
 }
 
-function SidebarLink({ icon: Icon, label, collapsed }) {
+function SidebarLink({ icon: Icon, label, collapsed,onClick,link }) {
   return (
-    <a
-      href="#"
+    <button
+      onClick= {()=>onClick(link)}
       className="flex items-center p-2 text-!customLavender rounded hover:bg-gray-700 transition-colors"
     >
       <Icon className="w-5 h-5" />
       {!collapsed && <span className="ml-3">{label}</span>}
-    </a>
+    </button>
   );
 }
