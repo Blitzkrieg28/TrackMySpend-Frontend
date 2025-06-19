@@ -42,8 +42,7 @@ export default function SidebarComponent({getstarted}) {
         <SidebarLink  href="#" icon={HiInbox} label="Expense" collapsed={collapsed} />
         <SidebarLink href="#" icon={HiUser} label="Budget" collapsed={collapsed} />
         <SidebarLink href="#" icon={HiShoppingBag} label="Report" collapsed={collapsed} />
-        <SidebarLink href="#" icon={HiArrowSmRight} label="Sign In" collapsed={collapsed} />
-        <SidebarLink href="#" icon={HiTable} label="Sign Up" collapsed={collapsed} />
+        
 
         <div className="border-t border-gray-700 pt-4">
           <SidebarLink icon={HiChartPie} label="Upgrade to Pro" collapsed={collapsed} />
@@ -58,7 +57,7 @@ function SidebarLink({ icon: Icon, label, collapsed,onClick,link }) {
   return (
     <button
       onClick= {()=>onClick(link)}
-      className="flex items-center p-2 text-!customLavender rounded hover:bg-gray-700 transition-colors"
+      className="flex items-center p-2 text-!customLavender rounded hover:bg-[#cccccc] transition-colors"
     >
       <Icon className="w-5 h-5" />
       {!collapsed && <span className="ml-3">{label}</span>}

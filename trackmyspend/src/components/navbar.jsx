@@ -1,6 +1,6 @@
 import { useState } from "react";
 import ThemeToggle from './Themetoggle';
-
+import logo from '../assets/budgeting.gif';
 export default function NavbarComponent() {
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -10,8 +10,8 @@ export default function NavbarComponent() {
 <div className="flex items-center justify-between max-w-screen-xl mx-auto">
         {/* Brand */}
         <div className="flex items-center space-x-3">
-          <img src="/favicon.svg" className="h-6 sm:h-9" alt="Logo" />
-          <span className="text-xl font-semibold whitespace-nowrap dark:text-white">
+          <img src={logo} className="w-14 " alt="Logo" />
+          <span className="text-2xl font-bold whitespace-nowrap dark:text-white">
             TrackMySpend
           </span>
         </div>
@@ -37,8 +37,8 @@ export default function NavbarComponent() {
             {dropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-customBlack border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50">
                 <div className="px-4 py-2">
-                  <p className="text-sm">Tanmay</p>
-                  <p className="text-sm font-medium truncate text-gray-500 dark:text-gray-300">
+                  <p className="text-lg">Tanmay</p>
+                  <p className="text-md font-segoe truncate text-gray-500 dark:text-gray-300">
                     you@example.com
                   </p>
                 </div>
@@ -46,12 +46,7 @@ export default function NavbarComponent() {
                   <li>
                     <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Dashboard</a>
                   </li>
-                  <li>
-                    <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Settings</a>
-                  </li>
-                  <li>
-                    <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Earnings</a>
-                  </li>
+                  
                   <li>
                     <hr className="my-1 border-gray-200 dark:border-gray-600" />
                   </li>
