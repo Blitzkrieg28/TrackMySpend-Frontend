@@ -5,6 +5,8 @@ import logo from "./assets/budgeting.gif";
 import { lazy, useEffect, useState,Suspense } from "react";
 import { AnimatedHeading } from "./components/AnimatedHeading";
 import Splash from "./components/SplashScreen";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Landing= lazy(() => import('./pages/Landing'));
 const Signin= lazy(() => import('./pages/Signin'));
@@ -33,6 +35,8 @@ function App() {
 
   return (
   <>
+        <ToastContainer position="top-right" />
+
   <BrowserRouter>
     <Routes>
        <Route path="/dashboard" element={<Suspense fallback={<Splash/>}><Dashboard/></Suspense>}></Route>

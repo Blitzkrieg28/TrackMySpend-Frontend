@@ -1,10 +1,20 @@
+import axios from "axios";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { TypeAnimation } from 'react-type-animation';
+import { toast } from "react-toastify";
 
 export default function InputFormModal({ isOpen, onClose }) {
   if (!isOpen) return null;
-  const [showButton, setShowButton] = useState(false);
+   const [showButton, setShowButton] = useState(false);
+   const [from,setFrom]= useState("");
+   const [amount,setAmount]= useState(0);
+   const [category,setCategory]= useState("");
+   const [date,setDate]= useState("");
+   const [time,setTime]= useState("");
+      const [count,setCount]= useState(0);
+
+
  
 
   return (
@@ -37,6 +47,7 @@ export default function InputFormModal({ isOpen, onClose }) {
           placeholder="Source"
           className="w-full p-2 mb-3 border rounded dark:bg-gray-800 dark:text-white"
           required
+          onChange={(e) => {setFrom(e.target.value)}}
         />
         </div>
         <div className="flex justify-start gap-2  items-center">
@@ -46,6 +57,7 @@ export default function InputFormModal({ isOpen, onClose }) {
           placeholder="Amount Recieved"
           className="w-full p-2 mb-3 border rounded dark:bg-gray-800 dark:text-white"
           required
+          onChange={(e) => {setAmount(e.target.value)}}
         />
         </div>
         <div className="flex justify-start gap-2  items-center">
@@ -55,6 +67,7 @@ export default function InputFormModal({ isOpen, onClose }) {
           placeholder="On which date?"
           className="w-full p-2 mb-3 border rounded dark:bg-gray-800 dark:text-white"
           required
+          onChange={(e)=>{setDate(e.target.value)}}
         />
         </div>
         <div className="mb-4 w-full">
@@ -68,6 +81,7 @@ export default function InputFormModal({ isOpen, onClose }) {
     type="time"
     id="time"
     className="w-full p-2 border rounded dark:bg-gray-800 dark:text-white"
+    onChange={(e) => {setTime(e.target.value)}}
   />
 </div>
 
@@ -78,22 +92,46 @@ export default function InputFormModal({ isOpen, onClose }) {
           placeholder="classify it!"
           className="w-full p-2 mb-3 border rounded dark:bg-gray-800 dark:text-white"
           required
+          onChange={(e) => {setCategory(e.target.value)}}
         />
         </div>
 
         <div className="flex justify-start gap-2  items-center">
-        <p className="pb-2 font-bold text-lg text-segoe" >Amount:</p>
+        <p className="pb-2 font-bold text-lg text-segoe" >Count:</p>
         <input
           type="number"
-          placeholder="Amount Recieved"
+          placeholder="how many times?"
           className="w-full p-2 mb-3 border rounded dark:bg-gray-800 dark:text-white"
           required
+          onChange={(e)=>{setCount(e.target.value)}}
         />
         </div>
         
         <div className="flex justify-center gap-3 pt-4">
           
-          <button className=" dark:bg-customLavender bg-[#8e8e8e] text-white px-4 py-2 rounded hover:bg-[#737373] hover:dark:bg-[#825ec9]">
+          <button className=" dark:bg-customLavender bg-[#8e8e8e] text-white px-4 py-2 rounded hover:bg-[#737373] hover:dark:bg-[#825ec9]"
+                onClick={async () => {
+    try {
+      const response = await axios.post(
+        "https://trackmyspendapi-3.onrender.com/income/addincome",
+        {
+          from: from,
+          amount: Number(amount),
+          category: category,
+          date: date,
+          time: time,
+          count: Number(count),
+        }
+      );
+      toast.success("Income added successfully!");
+    } catch (err) {
+      console.error("Add income error:", err);
+      toast.error(
+        "Failed to add income, please try again."
+      );
+    }
+  }}
+          >
             Add
           </button>
           <button
