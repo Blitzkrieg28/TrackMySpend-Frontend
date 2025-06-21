@@ -11,48 +11,69 @@ import UpdateFormModal from "./UpdateFormModal";
 export default function IncomeListCard({ data, onBack }) {
    const [incomes, setIncomes] = useState([]);
 
+const fetchTotal = (params = {}) => {
+  const qs = new URLSearchParams(params).toString();
+  return axios.get(`https://trackmyspendapi-3.onrender.com/income/totalincome?${qs}`);
+};
+
   useEffect(()=> {
      axios.get("https://trackmyspendapi-3.onrender.com/income/viewincome")
      .then((res) => {setIncomes(res.data.incomelist)})
       .catch((err) => console.error(err));
 
+      fetchTotal()
+    .then((res) => {
+      setTotalIncome(Number(res.data.totalIncome));
+    })
+    .catch((err) => console.error("Error fetching initial total income:", err));
+
   },[])
 
   const [totalIncome,setTotalIncome]= useState(0);
 
-  useEffect(()=>{
-  axios.get("https://trackmyspendapi-3.onrender.com/income/totalincome")
-         .then((res) => {setTotalIncome(Number(res.data.totalIncome))})
-         .catch((err) => console.error(err));
-
-  },[]);
+  
 const [query, setQuery] = useState("");
-const [searchBy, setSearchBy] = useState("from"); // or 'category'
-const [filterBy, setFilterBy] = useState(""); // one of the filter types
+
 useEffect(() => {
   if (query === "") {
     axios
       .get("https://trackmyspendapi-3.onrender.com/income/viewincome")
-      .then((res) => setIncomes(res.data.incomes || res.data.incomelist || []))
+      .then((res) => {
+        setIncomes(res.data.incomes || res.data.incomelist || []);
+        return fetchTotal(); // <-- fetch total income after resetting list
+      })
+      .then((res) => {
+        setTotalIncome(Number(res.data.totalIncome));
+      })
       .catch((err) => console.error(err));
   }
 }, [query]);
 
  const handleSearch = () => {
   console.log("Query:", query);
+  
+  const params = {};
+  if (query) params.category = query;
 
   axios
     .get(`https://trackmyspendapi-3.onrender.com/category/viewincomecategory?category=${query}`)
     .then((res) => {
       console.log("API response:", res.data);
-      setIncomes(res.data.categories || []); // Adjust if key is renamed
+      setIncomes(res.data.categories || []);
+      console.log("Calling total income with params:", params); 
+      return fetchTotal(params); 
+    })
+    .then((res2) => {
+      setTotalIncome(Number(res2.data.totalIncome));
     })
     .catch((err) => console.error("Search error:", err));
 };
+
 const [showFilter, setShowFilter] = useState(false);
 const [month, setMonth] = useState("");
 const [year, setYear] = useState("");
 const [day, setDay] = useState("");
+
 const applyFilter = () => {
   const params = {};
   if (month) params.month = month;
@@ -66,9 +87,17 @@ const applyFilter = () => {
     .then((res) => {
       setIncomes(res.data.filtered || []);
       setShowFilter(false);
+      console.log("Calling total income with params:", params); 
+      return fetchTotal(params); 
     })
-    .catch((err) => console.error(err));
+    .then((res2) => {
+      console.log("Fetched totalIncome from API:", res2.data);
+      setTotalIncome(Number(res2.data.totalIncome));
+    })
+    .catch((err) => console.error("Apply Filter Error:", err));
 };
+
+
 const [selectedIncomeId, setSelectedIncomeId] = useState(null);
 const [showdel,setShowDel]= useState(false);
 const [showupdate,setShowUpdate]= useState(false);
@@ -210,6 +239,9 @@ const [recordToEdit, setRecordToEdit] = useState(null);
                         list.map((i) => (i._id === updated._id ? updated : i))
                          );
                          setShowUpdate(false);
+                          fetchTotal()
+    .then((res) => setTotalIncome(Number(res.data.totalIncome)))
+    .catch((err) => console.error("Error updating total income:", err));
                           }}/>
                     )}
                     <img onClick={()=> {
@@ -217,8 +249,9 @@ const [recordToEdit, setRecordToEdit] = useState(null);
                           setSelectedIncomeId(inc._id);}}  src={logo4} className="w-5 h-5 cursor-pointer"></img>
                     {showdel &&  (
                      <Delcomp closeit={() => setShowDel(!showdel)}
-                     incomeid= {selectedIncomeId} incomes={incomes} setIncomes={setIncomes}/>
-
+                     incomeid= {selectedIncomeId} incomes={incomes} setIncomes={setIncomes}
+                     />
+                      
                     )}
                 </div>
               </td>
