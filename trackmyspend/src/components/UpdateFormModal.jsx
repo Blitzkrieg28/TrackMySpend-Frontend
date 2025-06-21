@@ -1,10 +1,15 @@
 import axios from "axios";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { TypeAnimation } from 'react-type-animation';
 import { toast } from "react-toastify";
 
-export default function InputFormModal({ isOpen, onClose }) {
+export default function UpdateFormModal({
+  isOpen,
+  onClose,
+  initialData,   // { _id, from, amount, category, date, time, count }
+  onSave         // callback to parent with updated record
+}) {
   if (!isOpen) return null;
    const [showButton, setShowButton] = useState(false);
    const [from,setFrom]= useState("");
@@ -13,6 +18,41 @@ export default function InputFormModal({ isOpen, onClose }) {
    const [date,setDate]= useState("");
    const [time,setTime]= useState("");
       const [count,setCount]= useState(0);
+
+        useEffect(() => {
+            console.log(initialData);
+    if ( isOpen&&initialData) {
+      setFrom(initialData.from);
+      setAmount(initialData.amount.toString());
+      setCategory(initialData.category);
+      setDate(initialData.date);
+      setTime(initialData.time || "");
+      setCount(initialData.count.toString());
+    }
+  }, [isOpen,initialData]);
+
+   const handleUpdate = async () => {
+    try {
+      const payload = {
+        id:       initialData._id,
+        from,
+        amount:   Number(amount),
+        category,
+        date,
+        time,
+        count:    Number(count),
+      };
+      const res = await axios.put(
+        "https://trackmyspendapi-3.onrender.com/income/updateincome",
+        payload
+      );
+     toast.success("updated successfully!!");
+      onSave(res.data.updatedincome);
+    } catch (err) {
+      console.error("Update failed:", err);
+       toast.error("updation failed!!");
+    }
+  };
 
 
  
@@ -26,13 +66,13 @@ export default function InputFormModal({ isOpen, onClose }) {
         exit={{ scale: 0.8, opacity: 0 }}
         className="bg-white dark:bg-customBlack p-6 rounded-xl shadow-lg w-full max-w-md  max-h-[90vh] overflow-y-auto"
       >
-        <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-customLavender">ADD INCOME</h2>
+        <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-customLavender">UPDATE INCOME</h2>
         <div className="h-px w-80 flex mx-auto bg-[#8e8e8e] mb-6"></div>
 
         <div className="flex justify-start pb-4">
             <TypeAnimation
   sequence={[
-    'Manually enter the info!!..',
+    'Update the info!!..',
   ]}
   wrapper="p"
   cursor={true}
@@ -45,6 +85,7 @@ export default function InputFormModal({ isOpen, onClose }) {
         <input
           type="text"
           placeholder="Source"
+          value={from}
           className="w-full p-2 mb-3 border rounded dark:bg-gray-800 dark:text-white"
           required
           onChange={(e) => {setFrom(e.target.value)}}
@@ -55,6 +96,7 @@ export default function InputFormModal({ isOpen, onClose }) {
         <input
           type="number"
           placeholder="Amount Recieved"
+          value={amount}
           className="w-full p-2 mb-3 border rounded dark:bg-gray-800 dark:text-white"
           required
           onChange={(e) => {setAmount(e.target.value)}}
@@ -65,6 +107,7 @@ export default function InputFormModal({ isOpen, onClose }) {
         <input
           type="date"
           placeholder="On which date?"
+          value={date}
           className="w-full p-2 mb-3 border rounded dark:bg-gray-800 dark:text-white"
           required
           onChange={(e)=>{setDate(e.target.value)}}
@@ -80,6 +123,7 @@ export default function InputFormModal({ isOpen, onClose }) {
   <input
     type="time"
     id="time"
+    value={time}
     className="w-full p-2 border rounded dark:bg-gray-800 dark:text-white"
     onChange={(e) => {setTime(e.target.value)}}
   />
@@ -90,6 +134,7 @@ export default function InputFormModal({ isOpen, onClose }) {
         <input
           type="text"
           placeholder="classify it!"
+          value={category}
           className="w-full p-2 mb-3 border rounded dark:bg-gray-800 dark:text-white"
           required
           onChange={(e) => {setCategory(e.target.value)}}
@@ -101,6 +146,7 @@ export default function InputFormModal({ isOpen, onClose }) {
         <input
           type="number"
           placeholder="how many times?"
+          value={count}
           className="w-full p-2 mb-3 border rounded dark:bg-gray-800 dark:text-white"
           required
           onChange={(e)=>{setCount(e.target.value)}}
@@ -110,30 +156,9 @@ export default function InputFormModal({ isOpen, onClose }) {
         <div className="flex justify-center gap-3 pt-4">
           
           <button className=" dark:bg-customLavender bg-[#8e8e8e] text-white px-4 py-2 rounded hover:bg-[#737373] hover:dark:bg-[#825ec9]"
-                onClick={async () => {
-    try {
-      const response = await axios.post(
-        "https://trackmyspendapi-3.onrender.com/income/addincome",
-        {
-          from: from,
-          amount: Number(amount),
-          category: category,
-          date: date,
-          time: time,
-          count: Number(count),
-        }
-      );
-      toast.success("Income added successfully!");
-            onClose();
-    } catch (err) {
-      console.error("Add income error:", err);
-      toast.error(
-        "Failed to add income, please try again."
-      );
-    }
-  }}
+                onClick={handleUpdate}
           >
-            Add
+            Update
           </button>
           <button
             onClick={onClose}
@@ -142,27 +167,7 @@ export default function InputFormModal({ isOpen, onClose }) {
             Cancel
           </button>
         </div>
-        <div className="flex items-center gap-4 my-4 ">
-  <div className="flex-grow h-px bg-gray-300 dark:bg-gray-600"></div>
-  <span className="text-sm text-gray-500 dark:text-gray-400">or</span>
-  <div className="flex-grow h-px bg-gray-300 dark:bg-gray-600"></div>
-</div>
-          <TypeAnimation
-  sequence={[
-    ' Try our new Auto-filling feature which fills the form just by using payment screenshot...',
-      () => setShowButton(true)
-  ]}
-  wrapper="p"
-  cursor={true}
-  repeat={0}       // Only once
-  className="text-base font-segoe text-gray-700 dark:text-gray-300 pb-2"
-/>
-
-{showButton && (
-        <button className=" dark:bg-customLavender bg-[#8e8e8e] text-white px-4 py-2 rounded hover:bg-[#737373] hover:dark:bg-[#825ec9]">
-            Try-Now
-          </button>
-      )}
+        
 
       </motion.div>
     </div>

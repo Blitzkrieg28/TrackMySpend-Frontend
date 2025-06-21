@@ -1,7 +1,13 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import logo1 from '../assets/search .png';
 import logo2 from '../assets/filter.png';
+import logo3 from '../assets/edit.png';
+import logo4 from '../assets/delete.png';
+import Delcomp from "./Deletecomp";
+import InputFormModal from "./InputFormModal";
+import UpdateFormModal from "./UpdateFormModal";
 export default function IncomeListCard({ data, onBack }) {
    const [incomes, setIncomes] = useState([]);
 
@@ -63,6 +69,10 @@ const applyFilter = () => {
     })
     .catch((err) => console.error(err));
 };
+const [selectedIncomeId, setSelectedIncomeId] = useState(null);
+const [showdel,setShowDel]= useState(false);
+const [showupdate,setShowUpdate]= useState(false);
+const [recordToEdit, setRecordToEdit] = useState(null);
 
   return (
     <div className="flex-1 p-6 mb-10  w-full flex justify-center ">
@@ -163,7 +173,12 @@ const applyFilter = () => {
               >
                 {h}
               </th>
+              
             ))}
+
+            <th className="px-4 py-2 border-b text-left text-gray-700 dark:text-gray-200">
+        Actions
+      </th>
           </tr>
         </thead>
        <tbody>
@@ -180,6 +195,33 @@ const applyFilter = () => {
               <td className="px-4 py-2 border-b">{inc.date}</td>
               <td className="px-4 py-2 border-b">{inc.time || "—"}</td>
               <td className="px-4 py-2 border-b">{inc.count}</td>
+              <td className="px-4 py-2 border-b">
+                <div className="flex justify-start items-center gap-3">
+                    <img  onClick={()=> {
+                        setShowUpdate(!showupdate);
+                        setRecordToEdit(inc);
+                    }} src={logo3} className="w-5 h-5 cursor-pointer"></img>
+                    {showupdate && recordToEdit && (
+                        <UpdateFormModal isOpen={showupdate} 
+                        onClose={() => setShowUpdate(!showupdate)}
+                        initialData={recordToEdit}
+                        onSave={(updated) => {
+                       setIncomes((list) =>
+                        list.map((i) => (i._id === updated._id ? updated : i))
+                         );
+                         setShowUpdate(false);
+                          }}/>
+                    )}
+                    <img onClick={()=> {
+                        setShowDel(!showdel);
+                          setSelectedIncomeId(inc._id);}}  src={logo4} className="w-5 h-5 cursor-pointer"></img>
+                    {showdel &&  (
+                     <Delcomp closeit={() => setShowDel(!showdel)}
+                     incomeid= {selectedIncomeId} incomes={incomes} setIncomes={setIncomes}/>
+
+                    )}
+                </div>
+              </td>
             </tr>
           ))}
         </tbody>
