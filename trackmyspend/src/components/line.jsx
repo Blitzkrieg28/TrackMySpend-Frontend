@@ -11,8 +11,8 @@ import {
   Filler
 } from 'chart.js';
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 
-// Register chart components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -25,99 +25,141 @@ ChartJS.register(
 );
 
 const customColors = {
-  expense: '#e6a943',       // customOrange
-  income: '#78b39b',        // customTealLight
-  background: '#242933',    // customDarkBlue
-  border: '#353d63',        // customIndigoDark
-  grayText: '#ededed',      // customLightGray
-  whiteText: '#fefeff',     // customNearWhite
+  income:   '#78b39b',
+  grayText: '#ededed',
+  whiteText:'#fefeff',
+  border:   '#353d63',
 };
 
-import { chartData } from './line_data';
 export default function LineGraph() {
-  const data= chartData;
-  const [options, setOptions] = useState();
-useEffect(() => {
-  setOptions({
-    responsive: true,
-    interaction: {
-      mode: 'index',
-      intersect: false,
-    },
-    plugins: {
-      legend: {
-        position: 'top',
-        labels: {
-          color: customColors.grayText,
-          font: { family: 'Inter', size: 12 }
-        }
-      },
-      tooltip: {
-        enabled: true,
-        mode: 'index',
-        intersect: false,
-        backgroundColor: customColors.border,
-        titleColor: customColors.whiteText,
-        bodyColor: customColors.grayText,
-        borderColor: customColors.grayText,
-        borderWidth: 1,
-      }
-    },
-    scales: {
-      x: {
-        ticks: {
-          color: customColors.grayText,
-          font: { size: 11 }
-        },
-        grid: {
-          color: 'rgba(255,255,255,0.05)', // regular grid lines
-          drawBorder: false
-        }
-      },
-      y: {
-        display: false,
-        grid: {
-          display: false
-        }
-      }
-    },
-    elements: {
-      point: {
-        radius: 0,
-        hoverRadius: 6,
-        hitRadius: 10,
-        backgroundColor: customColors.income,
-        borderColor: customColors.background,
-        borderWidth: 2,
-      },
-      line: {
-        tension: 0.4,
-        borderWidth: 2
-      }
+  const [viewMode, setViewMode] = useState('month'); 
+  const [chartData, setChartData] = useState(null);
+  const [options,   setOptions]   = useState(null);
+
+  useEffect(() => {
+    const now = new Date();
+    const year  = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const day   = now.getDate();
+
+    let url = `https://trackmyspendapi-3.onrender.com/income/`;
+
+    if (viewMode === 'week') {
+      // days of current week
+      const week = Math.ceil(day / 7);
+      url += `eachdayincome?year=${year}&month=${month}&week=${week}`;
+    } 
+    else if (viewMode === 'month') {
+      // weeks of current month
+      url += `eachweekincome?year=${year}&month=${month}`;
+    } 
+    else {
+      // months of current year
+      url += `eachmonthincome?year=${year}`;
     }
-  });
-}, []);
 
+    axios.get(url)
+      .then(res => {
+        // endpoint returns { days/weeks/months: [...], totals: [...] }
+        const raw   = res.data;
+        const labels= raw.days || raw.weeks || raw.months;
+        const totals= raw.totals;
 
+        setChartData({
+          labels,
+          datasets: [{
+            label: viewMode === 'week'
+                   ? 'Daily Income'
+                   : viewMode === 'month'
+                     ? 'Weekly Income'
+                     : 'Monthly Income',
+            data: totals,
+            borderColor: customColors.income,
+            backgroundColor: `${customColors.income}33`,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 4
+          }]
+        });
+      })
+      .catch(err => console.error(`Error fetching ${viewMode} data:`, err));
+  }, [viewMode]);
+
+  useEffect(() => {
+    setOptions({
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: customColors.border,
+          titleColor:     customColors.whiteText,
+          bodyColor:      customColors.grayText,
+          borderColor:    customColors.grayText,
+          borderWidth:    1
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: customColors.grayText },
+          grid:  { color: 'rgba(255,255,255,0.05)', drawBorder: false },
+          title: {
+            display: true,
+            
+            color: customColors.grayText,
+            font: { size: 14 }
+          }
+        },
+        y: {
+          ticks: { color: customColors.grayText },
+          grid:  { color: 'rgba(255,255,255,0.05)' },
+          title: {
+            display: true,
+            text: 'Income (₹)',
+            color: customColors.grayText,
+            font: { size: 14 }
+          }
+        }
+      },
+      elements: {
+        point: { hoverRadius: 6, hitRadius: 10 },
+        line:  { borderWidth: 2 }
+      }
+    });
+  }, [viewMode]);
 
   return (
-    <div className="max-w-sm w-full bg-white dark:bg-[#242933] rounded-lg shadow-sm p-4 md:p-6">
-      <div className="flex justify-between mb-5">
-        <h2 className="text-gray-900 dark:text-[#fefeff] text-lg font-semibold">Weekly Finance Report</h2>
-        <span className="text-sm text-gray-500 dark:text-customLavender">Last 7 Days</span>
+    <div className="w-full h-[400px] bg-white dark:bg-[#242933] rounded-lg shadow-sm p-4 md:p-6">
+      {/* dropdown */}
+      <div className='flex justify-between gap-4 items-center'>
+        <div className="flex justify-between mb-2">
+        <h2 className="text-gray-900 dark:text-[#fefeff] text-lg font-semibold">
+          {viewMode === 'week'  ? 'Income by Day'
+           : viewMode === 'month' ? 'Income by Week'
+                                  : 'Income by Month'}
+        </h2>
+      </div>
+      <div className="mb-4 mt-2">
+        <select
+          className="bg-[#e8e8e8] dark:bg-customBlack border border-[#8e8e8e] dark:border-custom1Blue text-gray-700 dark:text-gray-200 rounded-lg p-2"
+          value={viewMode}
+          onChange={e => setViewMode(e.target.value)}
+        >
+          <option value="week">This Week’s</option>
+          <option value="month">This Month’s</option>
+          <option value="year">This Year’s</option>
+        </select>
       </div>
 
-      {data && options ? (
-        <Line data={data} options={options} />
+      
+      </div>
+
+      {chartData && options ? (
+        <Line data={chartData} options={options} />
       ) : (
-        <p className="text-sm text-gray-400">Loading chart...</p>
+        <p className="text-sm text-gray-400">Loading chart…</p>
       )}
-
-      <div className="pt-5">
-        <button className="px-5 py-2.5 text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg focus:outline-none">
-          View Full Report
-        </button>
-      </div>
     </div>
   );
 }

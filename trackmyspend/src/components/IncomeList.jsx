@@ -8,7 +8,9 @@ import logo4 from '../assets/delete.png';
 import Delcomp from "./Deletecomp";
 import InputFormModal from "./InputFormModal";
 import UpdateFormModal from "./UpdateFormModal";
+import Analysis from "./Analysis";
 export default function IncomeListCard({ data, onBack }) {
+  const [viewanalysis,setViewAnalysis]= useState(false);
    const [incomes, setIncomes] = useState([]);
 
 const fetchTotal = (params = {}) => {
@@ -106,8 +108,10 @@ const [recordToEdit, setRecordToEdit] = useState(null);
   return (
     <div className="flex-1 p-6 mb-10  w-full flex justify-center ">
     <div className="w-full rounded-xl shadow-md border bg-white dark:bg-customBlack p-6 ">
+    {viewanalysis
+       ? (<Analysis onBack1={()=>setViewAnalysis(false)}/>):( 
      <div className="flex flex-col">
-        
+       
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Income List</h2>
         <button
@@ -266,9 +270,18 @@ const [recordToEdit, setRecordToEdit] = useState(null);
             <h1>₹{totalIncome.toLocaleString("en-IN")}</h1>
 
             </div>
+          <div className="flex justify-center items-center mt-6">
+            <button className=" dark:bg-customLavender bg-[#8e8e8e] text-white px-4 py-2 rounded hover:bg-[#737373] hover:dark:bg-[#825ec9]"
+                onClick={()=> setViewAnalysis(true)}
+          >
+            View Analysis
+          </button>
+         
+          </div>
+
         </div>
       </div>
-      
+        )}
     </div>
     </div>
   );
