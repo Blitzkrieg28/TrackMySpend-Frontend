@@ -3,9 +3,12 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { TypeAnimation } from 'react-type-animation';
 import { toast } from "react-toastify";
+import { subscribeToPush } from "../utils/subscibeTopush";
 
 export default function InputFormModal({ isOpen, onClose }) {
   if (!isOpen) return null;
+  const [subscriptionId, setSubscriptionId] = useState(null);
+
    const [showButton, setShowButton] = useState(false);
    const [from,setFrom]= useState("");
    const [amount,setAmount]= useState(0);
@@ -13,6 +16,7 @@ export default function InputFormModal({ isOpen, onClose }) {
    const [date,setDate]= useState("");
    const [time,setTime]= useState("");
       const [count,setCount]= useState(0);
+const [incomeId, setIncomeId] = useState(null);
 
 
  
@@ -124,7 +128,9 @@ export default function InputFormModal({ isOpen, onClose }) {
         }
       );
       toast.success("Income added successfully!");
-            onClose();
+            setIncomeId(response.data._id || response.data.income._id); 
+
+            //onClose();
     } catch (err) {
       console.error("Add income error:", err);
       toast.error(
@@ -141,7 +147,61 @@ export default function InputFormModal({ isOpen, onClose }) {
           >
             Cancel
           </button>
+          <div className="flex justify-center pt-2">
+            
+</div>
+
         </div>
+        <div className="mt-6">
+        <TypeAnimation
+  sequence={[
+    ' you can also set a reminder for your future income!!',
+      () => setShowButton(true)
+  ]}
+  wrapper="p"
+  cursor={true}
+  repeat={0}       // Only once
+  className="text-base font-segoe text-gray-700 dark:text-gray-300 pb-2"
+/>
+
+<button
+  className="dark:bg-customLavender bg-[#8e8e8e] text-white px-4 py-2 rounded hover:bg-[#737373] hover:dark:bg-[#825ec9] mt-3"
+  onClick={async () => {
+    try {
+      // 1️⃣ Subscribe to push and grab the ID
+      const { subscriptionId } = await subscribeToPush();
+      setSubscriptionId(subscriptionId);
+
+      // 2️⃣ Build the JS Date for the reminder
+      const remindAt = new Date(`${date}T${time || "09:00"}`);
+      const now = new Date();
+
+      // 3️⃣ Only proceed if remindAt is strictly in the future
+      if (remindAt <= now) {
+        toast.warn("Please select a future date and time for your reminder.");
+        return;
+      }
+
+      // 4️⃣ Fire the reminder‐creation call
+      await axios.post("https://trackmyspendapi-3.onrender.com/reminder/add", {
+        incomeId,
+        remindAt,
+        subscriptionId,
+      });
+
+      toast.success("Reminder set!");
+      onClose();
+    } catch (err) {
+      console.error("Failed to set reminder:", err);
+      toast.error("Failed to set reminder");
+    }
+  }}
+>
+  🔔 Enable Reminder Notifications
+</button>
+</div>
+
+
         <div className="flex items-center gap-4 my-4 ">
   <div className="flex-grow h-px bg-gray-300 dark:bg-gray-600"></div>
   <span className="text-sm text-gray-500 dark:text-gray-400">or</span>
