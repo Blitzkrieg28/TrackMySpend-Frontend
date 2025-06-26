@@ -1,12 +1,12 @@
-"use client"
 
 import { TypeAnimation } from "react-type-animation"
 import LineGraph from "./line"
 import { useState, useEffect } from "react"
 import axios from "axios"
 import { ArrowLeft, TrendingUp, TrendingDown, DollarSign, Calendar, Clock, BarChart3,IndianRupee } from "lucide-react"
+import LineGraphExp from "./linexp"
 
-export default function Analysis({ onBack1 }) {
+export default function AnalysisExp({ onBack1 }) {
   const [totals, setTotals] = useState({
     total: 0,
     today: 0,
@@ -29,31 +29,31 @@ export default function Analysis({ onBack1 }) {
         const day = now.getDate()
 
         const [totalRes, todayRes, yesterdayRes, monthRes, lastMonthRes, yearRes, lastYearRes] = await Promise.all([
-          axios.get(`https://trackmyspendapi-3.onrender.com/income/totalincome`),
+          axios.get(`https://trackmyspendapi-3.onrender.com/expense/totalexpense`),
           axios.get(
-            `https://trackmyspendapi-3.onrender.com/income/dailytotalincome?day=${day}&month=${month}&year=${year}`,
+            `https://trackmyspendapi-3.onrender.com/expense/dailytotalexpense?day=${day}&month=${month}&year=${year}`,
           ),
           axios.get(
-            `https://trackmyspendapi-3.onrender.com/income/dailytotalincome?day=${day - 1}&month=${month}&year=${year}`,
+            `https://trackmyspendapi-3.onrender.com/expense/dailytotalexpense?day=${day - 1}&month=${month}&year=${year}`,
           ),
-          axios.get(`https://trackmyspendapi-3.onrender.com/income/monthlytotalincome?month=${month}&year=${year}`),
-          axios.get(`https://trackmyspendapi-3.onrender.com/income/monthlytotalincome?month=${month - 1}&year=${year}`),
-          axios.get(`https://trackmyspendapi-3.onrender.com/income/yearlytotalincome?year=${year}`),
-          axios.get(`https://trackmyspendapi-3.onrender.com/income/yearlytotalincome?year=${year - 1}`),
+          axios.get(`https://trackmyspendapi-3.onrender.com/expense/monthlytotalexpense?month=${month}&year=${year}`),
+          axios.get(`https://trackmyspendapi-3.onrender.com/expense/monthlytotalexpense?month=${month - 1}&year=${year}`),
+          axios.get(`https://trackmyspendapi-3.onrender.com/expense/yearlytotalexpense?year=${year}`),
+          axios.get(`https://trackmyspendapi-3.onrender.com/expense/yearlytotalexpense?year=${year - 1}`),
         ])
 
         setTotals({
-          total: totalRes.data.totalIncome || 0,
-          today: todayRes.data.totalDailyIncome || 0,
-          yesterday: yesterdayRes.data.totalDailyIncome || 0,
-          thisMonth: monthRes.data.totalMonthlyIncome || 0,
-          lastMonth: lastMonthRes.data.totalMonthlyIncome || 0,
-          thisYear: yearRes.data.totalYearlyIncome || 0,
-          lastYear: lastYearRes.data.totalYearlyIncome || 0,
+          total: totalRes.data.totalExpense || 0,
+          today: todayRes.data.totalDailyExpense || 0,
+          yesterday: yesterdayRes.data.totalDailyExpense || 0,
+          thisMonth: monthRes.data.totalMonthlyExpense || 0,
+          lastMonth: lastMonthRes.data.totalMonthlyExpense || 0,
+          thisYear: yearRes.data.totalYearlyExpense || 0,
+          lastYear: lastYearRes.data.totalYearlyExpense || 0,
         })
       } catch (err) {
-        console.error("Error fetching income data:", err)
-        setError("Failed to load income data. Please try again.")
+        console.error("Error fetching expense data:", err)
+        setError("Failed to load expense data. Please try again.")
       } finally {
         setLoading(false)
       }
@@ -117,7 +117,7 @@ export default function Analysis({ onBack1 }) {
             <div className="text-base sm:text-lg text-gray-600 dark:text-gray-300">
               <TypeAnimation
                 sequence={[
-                  "Analyze and manage your income...",
+                  "Analyze and manage your expense...",
                   1000,
                   "Track expenses and plan budgets...",
                   1000,
@@ -138,15 +138,15 @@ export default function Analysis({ onBack1 }) {
         {/* Stats Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
           <StatsCard
-            title="Total Income"
+            title="Total Expense"
             amount={totals.total}
             icon={<IndianRupee className="w-6 h-6" />}
-            description="Your total income"
+            description="Your total expense"
             formatCurrency={formatCurrency}
           />
 
           <StatsCard
-            title="Today's Income"
+            title="Today's Expense"
             amount={totals.today}
             icon={<Clock className="w-6 h-6" />}
             description={
@@ -161,7 +161,7 @@ export default function Analysis({ onBack1 }) {
           />
 
           <StatsCard
-            title="Month's Income"
+            title="Month's Expense"
             amount={totals.thisMonth}
             icon={<Calendar className="w-6 h-6" />}
             description={
@@ -176,7 +176,7 @@ export default function Analysis({ onBack1 }) {
           />
 
           <StatsCard
-            title="Yearly Income"
+            title="Yearly Expense"
             amount={totals.thisYear}
             icon={<BarChart3 className="w-6 h-6" />}
             description={
@@ -197,11 +197,11 @@ export default function Analysis({ onBack1 }) {
         {/* Chart Section */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
           <div className="mb-4">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white mb-2">Income Trends</h2>
-            <p className="text-gray-600 dark:text-gray-300">Visual representation of your income over time</p>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white mb-2">Expense Trends</h2>
+            <p className="text-gray-600 dark:text-gray-300">Visual representation of your expenditure over time</p>
           </div>
           <div className="w-full h-64 sm:h-80 lg:h-96">
-            <LineGraph />
+            <LineGraphExp />
           </div>
         </div>
       </div>

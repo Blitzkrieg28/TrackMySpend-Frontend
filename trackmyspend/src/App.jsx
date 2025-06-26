@@ -13,6 +13,7 @@ const Signin= lazy(() => import('./pages/Signin'));
 const Signup= lazy(() => import('./pages/Signup'));
 const Dashboard= lazy(()=> import('./pages/Dashboard'));
 const Income= lazy(()=> import('./pages/Income'));
+const Expense= lazy(()=> import('./pages/Expense'));
 function App() {
  
   const [showSplash,setShowSplash]= useState(true);
@@ -52,7 +53,7 @@ function App() {
         <Route path="/signin" element={<Suspense fallback={<Splash />}><Signin/></Suspense>}></Route>
         <Route path="/signup" element={<Suspense fallback={<Splash/>}><Signup/></Suspense>}></Route> 
         <Route path="/income" element={<Suspense fallback={<Splash/>}><Income/></Suspense>}></Route> 
-
+        <Route path="/expense" element={<Suspense fallback={<Splash/>}><Expense/></Suspense>}></Route>
          </Routes>
   </BrowserRouter>
   
