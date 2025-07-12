@@ -17,6 +17,7 @@ const Expense= lazy(()=> import('./pages/Expense'));
 const Budget= lazy(() =>import('./pages/Budget'));
 const Report= lazy(()=> import('./pages/Report'));
 const RepAnalysis= lazy(()=> import('./pages/RepAnalysis'));
+const OCRupload= lazy(()=> import('./pages/OCRupload'));
 function App() {
  
   const [showSplash,setShowSplash]= useState(true);
@@ -60,6 +61,7 @@ function App() {
         <Route path="/budget" element={<Suspense fallback-={<Splash/>}><Budget/></Suspense>}></Route>
         <Route path="/report" element={<Suspense fallback={<Splash/>}><Report/></Suspense>}></Route>
         <Route path="/repanalysis" element={<Suspense fallback={<Splash/>}><RepAnalysis/></Suspense>}></Route>
+        <Route path="/upload" element={<Suspense fallback={<Splash/>}><OCRupload/></Suspense>}></Route>
          </Routes>
   </BrowserRouter>
   

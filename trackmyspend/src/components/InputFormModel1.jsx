@@ -1,11 +1,12 @@
 import axios from "axios";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { TypeAnimation } from 'react-type-animation';
 import { toast } from "react-toastify";
 import { subscribeToPush } from "../utils/subscibeTopush";
+import { useSearchParams } from "react-router-dom";
 
-export default function InputFormModal1({ isOpen, onClose }) {
+export default function InputFormModal1({ isOpen, onClose,initialData}) {
   if (!isOpen) return null;
   const [subscriptionId, setSubscriptionId] = useState(null);
 
@@ -17,7 +18,16 @@ export default function InputFormModal1({ isOpen, onClose }) {
    const [time,setTime]= useState("");
    const [count,setCount]= useState(0);
 const [incomeId, setIncomeId] = useState(null);
+const [search] = useSearchParams();
+useEffect(() => {
+  if (!initialData) return;
 
+  if (initialData.partyName) setTo(initialData.partyName);
+  if (initialData.amount) setAmount(Number(initialData.amount));
+  if (initialData.date) setDate(initialData.date);
+  if (initialData.time) setTime(initialData.time);
+  if (initialData.count) setCount(Number(initialData.count));
+}, [initialData]);
 
  
 
@@ -49,6 +59,7 @@ const [incomeId, setIncomeId] = useState(null);
         <input
           type="text"
           placeholder="Sending to.."
+          value={to}
           className="w-full p-2 mb-3 border rounded dark:bg-gray-800 dark:text-white"
           required
           onChange={(e) => {setTo(e.target.value)}}
@@ -59,6 +70,7 @@ const [incomeId, setIncomeId] = useState(null);
         <input
           type="number"
           placeholder="Amount Spend"
+          value={amount}
           className="w-full p-2 mb-3 border rounded dark:bg-gray-800 dark:text-white"
           required
           onChange={(e) => {setAmount(e.target.value)}}
@@ -69,6 +81,7 @@ const [incomeId, setIncomeId] = useState(null);
         <input
           type="date"
           placeholder="On which date?"
+          value={date}
           className="w-full p-2 mb-3 border rounded dark:bg-gray-800 dark:text-white"
           required
           onChange={(e)=>{setDate(e.target.value)}}
@@ -84,6 +97,7 @@ const [incomeId, setIncomeId] = useState(null);
   <input
     type="time"
     id="time"
+    value={time}
     className="w-full p-2 border rounded dark:bg-gray-800 dark:text-white"
     onChange={(e) => {setTime(e.target.value)}}
   />
@@ -93,6 +107,7 @@ const [incomeId, setIncomeId] = useState(null);
         <p className="pb-2 font-bold text-lg text-segoe" >Category:</p>
         <input
           type="text"
+          value={category}
           placeholder="classify it!"
           className="w-full p-2 mb-3 border rounded dark:bg-gray-800 dark:text-white"
           required
@@ -105,6 +120,7 @@ const [incomeId, setIncomeId] = useState(null);
         <input
           type="number"
           placeholder="how many times?"
+          value={count}
           className="w-full p-2 mb-3 border rounded dark:bg-gray-800 dark:text-white"
           required
           onChange={(e)=>{setCount(e.target.value)}}
