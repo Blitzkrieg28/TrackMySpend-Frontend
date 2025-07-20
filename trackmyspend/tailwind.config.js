@@ -10,7 +10,7 @@ module.exports = {
  theme: {
     extend: {
       colors: {
-        customBlue: '#98b4ff',
+        customBlue: '#b28fff',
         customOrange: '#e6a943',
         customDarkBlue: '#242933',
         custom1Blue: '#94afff',
@@ -34,7 +34,7 @@ module.exports = {
     },
   },
   plugins: [
-     require('flowbite/plugin') // ✅ Add Flowbite plugin
+     require('flowbite/plugin') // ✅ Add this
   ],
   mode: "jit",
 }

@@ -1,227 +1,313 @@
 import React, { useEffect, useState } from "react";
-import irregularImg from "../assets/Screenshot-2025-06-17-013357.png"; // adjust path if needed
-import NavbarComponent from "../components/navbar"; // ensure correct casing
-import { Button } from "../components/Button";
-import { motion } from "framer-motion";
+import irregularImg from "../assets/Screenshot-2025-06-17-013357.png";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Navbar1 } from "../components/navbar1";
-import { Buttonfornav } from "../components/Buttonfornav";
+import { Button } from "../components/Button";
 import { FooterComponent } from "../components/Footer";
 import { useNavigate } from "react-router-dom";
 import Splash from "../components/SplashScreen";
+import { 
+  HiChartBar, 
+  HiCreditCard, 
+  HiTrendingUp, 
+  HiBell, 
+  HiDocumentReport,
+  HiArrowRight,
+  HiCheckCircle,
+  HiStar
+} from "react-icons/hi";
 
 export default function Landing() {
-    const navigate= useNavigate();
-    const [showSplash,SetShowSplash]= useState(false);
+    const navigate = useNavigate();
+    const [showSplash, setShowSplash] = useState(false);
+    const { scrollYProgress } = useScroll();
+    const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
 
-    const handlestart= function(){
-        SetShowSplash(true);
+    const handlestart = function() {
+        setShowSplash(true);
         setTimeout(() => {
-      navigate("/signin");
-    }, 3000); 
+            navigate("/signin");
+        }, 3000);
     }
-    const handlestart2= function(){
-        SetShowSplash(true);
+    
+    const handlestart2 = function() {
+        setShowSplash(true);
         setTimeout(() => {
-      navigate("/signup");
-    }, 3000); 
+            navigate("/signup");
+        }, 3000);
     }
+    
     if (showSplash) return <Splash />;
 
-  return (
-    <div className="bg-[#e8e8e8] dark:bg-customDarkBlue h-screen">
-      {/* Navbar at top */}
-      <Navbar1 onGetstarted= {handlestart} onGetstarted2={handlestart2}/>
-   <section className="h-screen bg-[#e8e8e8] pb-20">
-      {/* Centered card */}
-      <div className="flex items-center justify-center px-6 py-12">
-        <div className="bg-white rounded-3xl shadow-lg max-w-6xl w-full flex flex-col md:flex-row p-10 gap-10">
-         {/* Left Section */}
-<motion.div
-  className="flex-1 space-y-5"
-  initial="hidden"
-  whileInView="show"
-  viewport={{ once: false, amount: 0.2 }}
-  transition={{ staggerChildren: 0.2 }}
-  variants={{
-    hidden: {},
-    show: {
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  }}
->
-  {/* Heading */}
-  <motion.h2
-    className="text-3xl font-segoe font-bold text-[#333c4d] dark:text-[#9fb9d0]"
-    variants={{
-      hidden: { opacity: 0, y: 20 },
-      show: { opacity: 1, y: 0 },
-    }}
-    transition={{ duration: 0.6 }}
-  >
-TrackMySpend
-  </motion.h2>
+    const features = [
+        {
+            icon: HiCreditCard,
+            title: "Smart Expense Tracking",
+            description: "Log every transaction with intelligent categorization and real-time insights",
+            color: "bg-customBlue"
+        },
+        {
+            icon: HiTrendingUp,
+            title: "Income Management",
+            description: "Track all income sources and visualize your earning growth over time",
+            color: "bg-customTealLight"
+        },
+        {
+            icon: HiChartBar,
+            title: "Budget Planning",
+            description: "Set flexible budgets with smart alerts to keep you on track",
+            color: "bg-customLavender"
+        },
+        {
+            icon: HiDocumentReport,
+            title: "Advanced Analytics",
+            description: "Generate detailed reports and uncover saving opportunities",
+            color: "bg-customOrange"
+        },
+        {
+            icon: HiBell,
+            title: "Smart Reminders",
+            description: "Never miss a payment with intelligent notification system",
+            color: "bg-custom1Blue"
+        }
+    ];
 
-  {/* Description */}
-  <motion.p
-    className="font-segoe font-semibold text-[#333c4d] dark:text-[#9fb9d0]"
-    variants={{
-      hidden: { opacity: 0, y: 20 },
-      show: { opacity: 1, y: 0 },
-    }}
-    transition={{ duration: 0.6 }}
-  >
-    TrackMySpend is your personal finance sidekick, built to simplify money management and empower smarter decisions. In just a few taps, you can record every rupee you earn and spend, set flexible budgets that evolve with your needs, and generate insightful reports that shine a light on your financial habits. Whether you’re mapping out monthly goals or tracking long‑term milestones, TrackMySpend puts clarity and control at your fingertips. Say goodbye to guesswork and hello to a healthier financial future.
-  </motion.p>
+    const stats = [
+        { number: "10K+", label: "Active Users" },
+        { number: "₹50M+", label: "Tracked Expenses" },
+        { number: "95%", label: "User Satisfaction" },
+        { number: "24/7", label: "Support Available" }
+    ];
 
-  {/* List Items */}
-  <ul className="space-y-3 font-segoe text-[#333c4d] dark:text-[#9fb9d0]">
-    {[
-      "Quickly log transactions with intuitive forms, categories, and tags—so you always know exactly where your money goes.",
-      "Create and adjust budgets in real time, receive alerts when you’re nearing limits, and keep spending aligned with your goals.",
-      "Visualize trends with charts and summaries, compare periods, and uncover saving opportunities through easy-to-read dashboards."
-      
-    ].map((item, index) => (
-      <motion.li
-        key={index}
-        className="flex items-center space-x-3"
-        variants={{
-          hidden: { opacity: 0, x: -20 },
-          show: { opacity: 1, x: 0 },
-        }}
-        transition={{ duration: 0.5 }}
-      >
-        <span className="w-3 h-3 bg-red-400 rounded-full" />
-        <span className="text-gray-700">{item}</span>
-      </motion.li>
-    ))}
-  </ul>
+    return (
+        <div className="min-h-screen bg-customLightGray dark:bg-customDarkBlue overflow-hidden">
+            {/* Animated Background Elements */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <motion.div
+                    className="absolute -top-40 -right-40 w-80 h-80 bg-customBlue/20 rounded-full blur-3xl"
+                    animate={{
+                        scale: [1, 1.2, 1],
+                        rotate: [0, 180, 360],
+                    }}
+                    transition={{
+                        duration: 20,
+                        repeat: Infinity,
+                        ease: "linear"
+                    }}
+                />
+                <motion.div
+                    className="absolute -bottom-40 -left-40 w-80 h-80 bg-customTealLight/20 rounded-full blur-3xl"
+                    animate={{
+                        scale: [1.2, 1, 1.2],
+                        rotate: [360, 180, 0],
+                    }}
+                    transition={{
+                        duration: 25,
+                        repeat: Infinity,
+                        ease: "linear"
+                    }}
+                />
+            </div>
 
-  {/* Button */}
-  <motion.div
-    variants={{
-      hidden: { opacity: 0, y: 20 },
-      show: { opacity: 1, y: 0 },
-    }}
-    transition={{ duration: 0.6 }}
-  >
-    <Button label="Get-Started!!" trynow={handlestart2} />
-  </motion.div>
-</motion.div>
+            {/* Navigation */}
+            <motion.div
+                initial={{ y: -100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="relative z-10"
+            >
+                <Navbar1 onGetstarted={handlestart} onGetstarted2={handlestart2} />
+            </motion.div>
 
-          <motion.div
-  className="flex-1 flex justify-center items-center"
-  initial={{ opacity: 0, scale: 0.95 }}
-  whileInView={{ opacity: 1, scale: 1 }}
-  viewport={{ once: false, amount: 0.2 }}
-  transition={{ duration: 0.8, ease: "easeOut" }}
->
-  <img
-    src={irregularImg}
-    alt="Irregular Expenses"
-    className="max-w-md w-full rounded-lg shadow-md"
-  />
-</motion.div>
+            {/* Hero Section */}
+            <section className="relative min-h-screen flex items-center justify-center px-6 py-20">
+                <div className="max-w-7xl mx-auto">
+                    <div className="grid lg:grid-cols-2 gap-12 items-center">
+                        {/* Left Content */}
+                        <motion.div
+                            initial={{ opacity: 0, x: -50 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                            className="space-y-8"
+                        >
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2, duration: 0.6 }}
+                                className="inline-flex items-center px-4 py-2 bg-customBlue text-white rounded-full text-sm font-medium"
+                            >
+                                <HiStar className="w-4 h-4 mr-2" />
+                                #1 Personal Finance App
+                            </motion.div>
 
+                            <motion.h1
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.3, duration: 0.8 }}
+                                className="text-5xl lg:text-7xl font-bold text-customIndigoDark dark:text-custom1Blue"
+                            >
+                                TrackMy
+                                <span className="block text-customBlue">
+                                    Spend
+                                </span>
+                            </motion.h1>
+
+                            <motion.p
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.4, duration: 0.6 }}
+                                className="text-xl text-customIndigoDark dark:text-custom1Blue leading-relaxed"
+                            >
+                                Your personal finance sidekick that transforms how you manage money. 
+                                Track expenses, set budgets, and gain insights that lead to smarter financial decisions.
+                            </motion.p>
+
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.5, duration: 0.6 }}
+                                className="flex flex-col sm:flex-row gap-4"
+                            >
+                                <Button label="Get Started Free" trynow={handlestart2} />
+                                <button className="flex items-center gap-2 px-6 py-3 text-customIndigoDark dark:text-custom1Blue hover:text-customBlue dark:hover:text-custom1Blue transition-colors">
+                                    <span>Watch Demo</span>
+                                    <HiArrowRight className="w-5 h-5" />
+                                </button>
+                            </motion.div>
+
+                            {/* Stats */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.6, duration: 0.6 }}
+                                className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-8"
+                            >
+                                {stats.map((stat, index) => (
+                                    <motion.div
+                                        key={index}
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        transition={{ delay: 0.7 + index * 0.1, duration: 0.5 }}
+                                        className="text-center"
+                                    >
+                                        <div className="text-2xl lg:text-3xl font-bold text-customIndigoDark dark:text-custom1Blue">
+                                            {stat.number}
+                                        </div>
+                                        <div className="text-sm text-customIndigoDark/70 dark:text-custom1Blue/70">
+                                            {stat.label}
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </motion.div>
+                        </motion.div>
+
+                        {/* Right Content - Image */}
+                        <motion.div
+                            initial={{ opacity: 0, x: 50 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.3, duration: 0.8 }}
+                            className="relative"
+                        >
+                            <motion.div
+                                animate={{ y: [0, -10, 0] }}
+                                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                                className="relative"
+                            >
+                                <div className="absolute inset-0 bg-customBlue/20 rounded-3xl blur-xl"></div>
+                                <img
+                                    src={irregularImg}
+                                    alt="TrackMySpend Dashboard"
+                                    className="relative rounded-3xl shadow-2xl w-full max-w-lg mx-auto"
+                                />
+                            </motion.div>
+                        </motion.div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Features Section */}
+            <section className="relative py-20 px-6">
+                <div className="max-w-7xl mx-auto">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8 }}
+                        className="text-center mb-16"
+                    >
+                        <h2 className="text-4xl lg:text-5xl font-bold text-customIndigoDark dark:text-custom1Blue mb-6">
+                            Everything you need to
+                            <span className="block text-customBlue">
+                                manage your finances
+                            </span>
+                        </h2>
+                        <p className="text-xl text-customIndigoDark/70 dark:text-custom1Blue/70 max-w-3xl mx-auto">
+                            Powerful features designed to give you complete control over your financial life
+                        </p>
+                    </motion.div>
+
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {features.map((feature, index) => (
+                            <motion.div
+                                key={index}
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: index * 0.1, duration: 0.6 }}
+                                whileHover={{ y: -5, scale: 1.02 }}
+                                className="group relative"
+                            >
+                                <div className="absolute inset-0 bg-customBlue/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+                                <div className="relative bg-white dark:bg-customBlack rounded-2xl p-8 shadow-lg border border-customLavender dark:border-custom1Blue hover:shadow-xl transition-all duration-300">
+                                    <div className={`inline-flex items-center justify-center w-16 h-16 ${feature.color} rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                                        <feature.icon className="w-8 h-8 text-white" />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-customIndigoDark dark:text-customLavender mb-4">
+                                        {feature.title}
+                                    </h3>
+                                    <p className="text-customIndigoDark/70 dark:text-custom1Blue/70 leading-relaxed">
+                                        {feature.description}
+                                    </p>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* CTA Section */}
+            <section className="relative py-20 px-6">
+                <div className="max-w-4xl mx-auto text-center">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8 }}
+                        className="bg-customBlue rounded-3xl p-12 relative overflow-hidden"
+                    >
+                        <div className="absolute inset-0 bg-customBlue/20"></div>
+                        <div className="relative z-10">
+                            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
+                                Ready to take control of your finances?
+                            </h2>
+                            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+                                Join thousands of users who have already transformed their financial lives with TrackMySpend
+                            </p>
+                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                <Button label="Start Free Trial" trynow={handlestart2} />
+                                <button className="px-8 py-3 border-2 border-white text-white rounded-lg hover:bg-white hover:text-customBlue transition-colors">
+                                    Learn More
+                                </button>
+                            </div>
+                        </div>
+                    </motion.div>
+                </div>
+            </section>
+
+            {/* Footer */}
+            <section className="relative">
+                <FooterComponent />
+            </section>
         </div>
-      </div>
-      </section>
- <section className="h-screen bg-[#e8e8e8] ">
-  <div className="flex flex-col items-center justify-center px-6 bg-[#e8e8e8]">
-    {/* Card Wrapper */}
-    <div className="mt-10 p-6 rounded-3xl shadow-lg max-w-6xl w-full   bg-white dark:bg-customBlack ">
-      
-      {/* Heading inside the card wrapper */}
-      <div className="text-center mb-10">
-        <h2 className="text-3xl font-segoe font-bold text-[#333c4d] dark:text-[#9fb9d0]">Features</h2>
-      </div>
-
-     {/* Cards Grid */}
-<motion.div
-  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-  initial="hidden"
-  whileInView="show"
-  viewport={{ once: false, amount: 0.2 }}
-  transition={{ staggerChildren: 0.2 }}
-  variants={{
-    hidden: {},
-    show: {
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  }}
->
-  {/* Card Variants */}
-  {[
-    {
-      title: "Expense Tracking",
-      desc: [
-        "Log every purchase and outgoing payment in seconds with customizable categories and tags.",
-        "Gain real‑time visibility into your spending habits to curb unnecessary expenses.",
-      ],
-    },
-    {
-      title: "Income Management",
-      desc: [
-        "Record all your income sources—salary, freelance gigs, investments—effortlessly.",
-        "Track inflows over time to see how your earnings grow and diversify.",
-      ],
-    },
-    {
-      title: "Budget Planner",
-      desc: [
-        "Set up monthly or project‑based budgets that adapt as your needs change.",
-        "Receive alerts before you breach limits, keeping you on track with your financial goals.",
-      ],
-    },
-    {
-      title: "Advanced Reports",
-      desc: [
-        "Generate detailed charts and summaries to visualize trends across any period.",
-        "Compare past performance, spot anomalies, and identify saving opportunities at a glance.",
-      ],
-    },
-    {
-      title: "Reminder System",
-      desc: [
-        "Schedule custom reminders for bill payments, subscriptions, and financial milestones.",
-        "Never miss a due date again with timely notifications delivered straight to your device.",
-      ],
-    },
-  ].map((item, i) => (
-    <motion.div
-      key={i}
-      className="flex flex-col rounded-xl shadow-md border border-customLavender dark:border-custom1Blue bg-white dark:bg-customBlack p-6"
-      variants={{
-        hidden: { opacity: 0, y: 20 },
-        show: { opacity: 1, y: 0 },
-      }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-    >
-      <h1 className="text-xl font-bold font-segoe">{item.title}</h1>
-      <ul className="flex-grow list-disc list-inside mt-2 font-segoe text-[#333c4d] dark:text-[#9fb9d0]">
-        {item.desc.map((line, idx) => (
-          <li key={idx}>{line}</li>
-        ))}
-      </ul>
-      <div className="flex justify-center mt-4">
-        <Buttonfornav label="Try now" />
-      </div>
-    </motion.div>
-  ))}
-</motion.div>
-
-    </div>
-  </div>
-</section>
-
-<section className="bg-[#e8e8e8] ">
-    <div className="bg-[#e8e8e8] mt-20">
-    <FooterComponent/>
-    </div>
-</section>
-    </div>
-  );
+    );
 }

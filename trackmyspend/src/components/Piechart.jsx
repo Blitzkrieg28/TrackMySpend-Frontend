@@ -4,6 +4,7 @@ import { Pie } from "react-chartjs-2"
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js"
 import { useEffect, useState } from "react"
 import axios from "axios"
+import { motion } from "framer-motion"
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -132,24 +133,52 @@ export function PieChartForRep({ month }) {
 
   if (loading) {
     return (
-      <div className="w-full h-full flex items-center justify-center">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="w-full h-full flex items-center justify-center"
+      >
         <div className="flex flex-col items-center space-y-3">
-          <div className="animate-spin rounded-full h-8 w-8 border-2 border-purple-600 border-t-transparent"></div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Loading category data...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-customBlue border-t-transparent"></div>
+          <p className="text-sm text-customIndigoDark/70 dark:text-custom1Blue/70">Loading category data...</p>
         </div>
-      </div>
+      </motion.div>
     )
   }
 
   return (
-    <div className="w-full h-full">
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.6 }}
+      className="w-full h-full bg-white dark:bg-customBlack rounded-2xl p-6 shadow-lg border border-customLavender dark:border-custom1Blue"
+    >
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold text-customIndigoDark dark:text-custom1Blue mb-2">
+          Expense Categories
+        </h3>
+        <p className="text-sm text-customIndigoDark/70 dark:text-custom1Blue/70">
+          Breakdown of your spending by category
+        </p>
+      </div>
+      
       {chartData && options ? (
-        <Pie data={chartData} options={options} />
+        <div className="h-[300px]">
+          <Pie data={chartData} options={options} />
+        </div>
       ) : (
-        <div className="w-full h-full flex items-center justify-center">
-          <p className="text-sm text-gray-500 dark:text-gray-400">No category data available</p>
+        <div className="w-full h-[300px] flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 mx-auto mb-4 bg-customLightGray dark:bg-customDarkBlue rounded-full flex items-center justify-center">
+              <svg className="w-8 h-8 text-customIndigoDark/50 dark:text-custom1Blue/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+              </svg>
+            </div>
+            <p className="text-sm text-customIndigoDark/70 dark:text-custom1Blue/70">No category data available</p>
+          </div>
         </div>
       )}
-    </div>
+    </motion.div>
   )
 }

@@ -12,6 +12,7 @@ import {
 } from 'chart.js';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { motion } from 'framer-motion';
 
 ChartJS.register(
   CategoryScale,
@@ -34,36 +35,34 @@ const customColors = {
 export default function LineGraph() {
   const [viewMode, setViewMode] = useState('month'); 
   const [chartData, setChartData] = useState(null);
-  const [options,   setOptions]   = useState(null);
+  const [options, setOptions] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const now = new Date();
-    const year  = now.getFullYear();
+    const year = now.getFullYear();
     const month = now.getMonth() + 1;
-    const day   = now.getDate();
+    const day = now.getDate();
 
     let url = `https://trackmyspendapi-3.onrender.com/income/`;
 
     if (viewMode === 'week') {
-      // days of current week
       const week = Math.ceil(day / 7);
       url += `eachdayincome?year=${year}&month=${month}&week=${week}`;
     } 
     else if (viewMode === 'month') {
-      // weeks of current month
       url += `eachweekincome?year=${year}&month=${month}`;
     } 
     else {
-      // months of current year
       url += `eachmonthincome?year=${year}`;
     }
 
+    setLoading(true);
     axios.get(url)
       .then(res => {
-        // endpoint returns { days/weeks/months: [...], totals: [...] }
-        const raw   = res.data;
-        const labels= raw.days || raw.weeks || raw.months;
-        const totals= raw.totals;
+        const raw = res.data;
+        const labels = raw.days || raw.weeks || raw.months;
+        const totals = raw.totals;
 
         setChartData({
           labels,
@@ -81,8 +80,12 @@ export default function LineGraph() {
             pointRadius: 4
           }]
         });
+        setLoading(false);
       })
-      .catch(err => console.error(`Error fetching ${viewMode} data:`, err));
+      .catch(err => {
+        console.error(`Error fetching ${viewMode} data:`, err);
+        setLoading(false);
+      });
   }, [viewMode]);
 
   useEffect(() => {
@@ -91,75 +94,129 @@ export default function LineGraph() {
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { display: false },
+        legend: { 
+          display: false 
+        },
         tooltip: {
           backgroundColor: customColors.border,
-          titleColor:     customColors.whiteText,
-          bodyColor:      customColors.grayText,
-          borderColor:    customColors.grayText,
-          borderWidth:    1
+          titleColor: customColors.whiteText,
+          bodyColor: customColors.grayText,
+          borderColor: customColors.grayText,
+          borderWidth: 1
         }
       },
       scales: {
         x: {
-          ticks: { color: customColors.grayText },
-          grid:  { color: 'rgba(255,255,255,0.05)', drawBorder: false },
-          title: {
-            display: true,
-            
+          ticks: { 
             color: customColors.grayText,
-            font: { size: 14 }
+            font: {
+              size: 12,
+              weight: '500'
+            }
+          },
+          grid: { 
+            color: 'rgba(255,255,255,0.05)', 
+            drawBorder: false 
           }
         },
         y: {
-          ticks: { color: customColors.grayText },
-          grid:  { color: 'rgba(255,255,255,0.05)' },
-          title: {
-            display: true,
-            text: 'Income (₹)',
+          ticks: { 
             color: customColors.grayText,
-            font: { size: 14 }
+            font: {
+              size: 12,
+              weight: '500'
+            }
+          },
+          grid: { 
+            color: 'rgba(255,255,255,0.05)' 
           }
         }
       },
       elements: {
-        point: { hoverRadius: 6, hitRadius: 10 },
-        line:  { borderWidth: 2 }
+        point: { 
+          hoverRadius: 6, 
+          hitRadius: 10 
+        },
+        line: { 
+          borderWidth: 2 
+        }
       }
     });
   }, [viewMode]);
 
+  const viewModeOptions = [
+    { value: 'week', label: 'This Week' },
+    { value: 'month', label: 'This Month' },
+    { value: 'year', label: 'This Year' }
+  ];
+
   return (
-    <div className="w-full h-[400px] bg-white dark:bg-[#242933] rounded-lg shadow-sm p-4 md:p-6">
-      {/* dropdown */}
-      <div className='flex justify-between gap-4 items-center'>
-        <div className="flex justify-between mb-2">
-        <h2 className="text-gray-900 dark:text-[#fefeff] text-lg font-semibold">
-          {viewMode === 'week'  ? 'Income by Day'
-           : viewMode === 'month' ? 'Income by Week'
-                                  : 'Income by Month'}
-        </h2>
-      </div>
-      <div className="mb-4 mt-2">
-        <select
-          className="bg-[#e8e8e8] dark:bg-customBlack border border-[#8e8e8e] dark:border-custom1Blue text-gray-700 dark:text-gray-200 rounded-lg p-2"
-          value={viewMode}
-          onChange={e => setViewMode(e.target.value)}
+    <div className="w-full h-[400px]">
+      {/* Header with dropdown */}
+      <div className="flex justify-between items-center mb-6">
+        <motion.h3 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="text-lg font-semibold text-customIndigoDark dark:text-custom1Blue"
         >
-          <option value="week">This Week’s</option>
-          <option value="month">This Month’s</option>
-          <option value="year">This Year’s</option>
-        </select>
+          {viewMode === 'week' ? 'Daily Income'
+           : viewMode === 'month' ? 'Weekly Income'
+                                  : 'Monthly Income'}
+        </motion.h3>
+        
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="relative"
+        >
+          <select
+            className="appearance-none bg-white dark:bg-customBlack border border-customLavender dark:border-custom1Blue text-customIndigoDark dark:text-custom1Blue rounded-xl px-4 py-2 pr-10 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-customBlue focus:border-transparent transition-all duration-200"
+            value={viewMode}
+            onChange={e => setViewMode(e.target.value)}
+          >
+            {viewModeOptions.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <svg className="w-4 h-4 text-customIndigoDark dark:text-custom1Blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </motion.div>
       </div>
 
-      
-      </div>
-
-      {chartData && options ? (
-        <Line data={chartData} options={options} />
-      ) : (
-        <p className="text-sm text-gray-400">Loading chart…</p>
-      )}
+      {/* Chart Container */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="relative bg-white dark:bg-customBlack rounded-2xl p-6 shadow-lg border border-customLavender dark:border-custom1Blue"
+      >
+        {loading ? (
+          <div className="w-full h-[300px] flex items-center justify-center">
+            <div className="flex flex-col items-center space-y-3">
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-customBlue border-t-transparent"></div>
+              <p className="text-sm text-customIndigoDark/70 dark:text-custom1Blue/70">Loading chart data...</p>
+            </div>
+          </div>
+        ) : chartData && options ? (
+          <Line data={chartData} options={options} />
+        ) : (
+          <div className="w-full h-[300px] flex items-center justify-center">
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-customLightGray dark:bg-customDarkBlue rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8 text-customIndigoDark/50 dark:text-custom1Blue/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <p className="text-sm text-customIndigoDark/70 dark:text-custom1Blue/70">No data available</p>
+            </div>
+          </div>
+        )}
+      </motion.div>
     </div>
   );
 }
