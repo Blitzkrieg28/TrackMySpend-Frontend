@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect, useRef } from "react"
 import { createWorker } from "tesseract.js"
 import wasmURL from "tesseract.js-core/tesseract-core.wasm?url"
@@ -8,10 +7,10 @@ import InputFormModal1 from "../components/InputFormModel1"
 import { parseTextIntoFields } from "../utils/OCRParser"
 import { motion } from "framer-motion"
 import { TypeAnimation } from 'react-type-animation'
-import { 
-  HiSparkles, 
-  HiUpload, 
-  HiCamera, 
+import {
+  HiSparkles,
+  HiUpload,
+  HiCamera,
   HiDocumentText,
   HiCheckCircle,
   HiXCircle,
@@ -20,6 +19,7 @@ import {
 import NavbarComponent from "../components/navbar"
 import Component from "../components/sidebar"
 import { useNavigate } from "react-router-dom"
+import axios from "axios"
 
 const OCRUploader = () => {
   const fileInputRef = useRef(null)
@@ -30,6 +30,9 @@ const OCRUploader = () => {
   const [isExpense, setIsExpense] = useState(false)
   const [progress, setProgress] = useState(0)
   const [currentStep, setCurrentStep] = useState("")
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+
   const navigate = useNavigate()
 
   const handlestart5 = (link) => {
@@ -45,13 +48,11 @@ const OCRUploader = () => {
         const worker = await createWorker("eng", {
           corePath: wasmURL,
         })
-
         // Basic Tesseract parameters
         await worker.setParameters({
           tessedit_pageseg_mode: "6", // Uniform block of text
           tessedit_ocr_engine_mode: "2", // LSTM only
         })
-
         workerRef.current = worker
         setReady(true)
         setCurrentStep("")
@@ -113,7 +114,7 @@ const OCRUploader = () => {
         const data = imageData.data
         
         // Enhance text clarity after scaling
-        for (let i = 0; i < data.length; i += 4) {      
+        for (let i = 0; i < data.length; i += 4) {
           // Convert to grayscale
           const gray = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2])
           
@@ -147,142 +148,85 @@ const OCRUploader = () => {
   }
 
   const handleFileChange = async (e) => {
-    if (!ready) return
+    const file = e.target.files[0];
+    if (!file) return;
 
-    const file = e.target.files[0]
-    if (!file) return
+    if (file.size > 5 * 1024 * 1024) {
+      alert("⚠️ Image too large. Please use an image smaller than 5MB.");
+      return;
+    }
 
-    setLoading(true)
-    setProgress(0)
-    setCurrentStep("Starting OCR processing...")
+    setLoading(true);
+    setProgress(10);
+    setCurrentStep("Uploading image to OCR API...");
 
     try {
-      if (file.size > 5 * 1024 * 1024) {
-        alert("⚠️ Image too large. Please use an image smaller than 5MB.")
-        return
-      }
+      const formData = new FormData();
+      formData.append("image", file);
 
-      setProgress(10)
-      setCurrentStep("Normalizing font sizes...")
+      const response = await axios.post("https://trackmyspendapi-3.onrender.com/ocr/advanced", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setProgress(percentCompleted);
+        },
+      });
 
-      // Normalize font sizes first
-      const normalizedBlob = await normalizeFontSize(file)
+      const { data } = response;
 
-      setProgress(20)
-      setCurrentStep("Reading processed image...")
+      if (data.success) {
+        const isExpenseType = data.data.isExpense;
+        
+        // Extract the name/merchant from the API response
+        const extractedName = data.data.name || data.data.merchant || '';
+        
+        const parsed = {
+          amount: parseFloat(data.data.amount || 0),
+          date: data.data.date || '',
+          time: data.data.time || '',
+          confidence: 100,
+          amountDetected: data.data.amount ? "Yes" : "No",
+          count: 1,
+          // Include both from and to fields in parsed data
+          from: isExpenseType ? '' : extractedName,
+          to: isExpenseType ? extractedName : '',
+          // Add any other fields from the API response
+          merchant: data.data.merchant || '',
+          category: data.data.category || '',
+          description: data.data.description || '',
+        };
 
-      // Convert normalized blob to base64
-      const reader = new FileReader()
+        setParsedData(parsed);
+        setIsExpense(isExpenseType);
+        setCurrentStep("Parsing complete");
 
-      reader.onload = async () => {
-        try {
-          setProgress(40)
-          setCurrentStep("Performing OCR...")
-
-          console.log("🔍 Starting OCR processing...")
-
-          // Perform OCR with Tesseract.js
-          const result = await workerRef.current.recognize(reader.result)
-
-          console.log(`✅ OCR Result - Confidence: ${result.data.confidence}%`)
-          console.log("[RAW OCR TEXT]", result.data.text)
-
-          setProgress(80)
-          setCurrentStep("Parsing transaction data...")
-
-          // Parse the OCR text
-          const { isExpense, partyName, date, time, count } = parseTextIntoFields(result.data.text)
-
-          // Extract amount from OCR text (simple approach)
-          const extractAmount = (text) => {
-            const lines = text.split("\n").map(line => line.trim()).filter(Boolean)
-            const hasPaidTo = text.toLowerCase().includes("paid to")
-            
-            for (const line of lines) {
-              // Look for rupee amounts
-              const rupeeMatch = line.match(/₹\s*([\d,]+(?:\.\d{2})?)/);
-              if (rupeeMatch) {
-                let amountStr = rupeeMatch[1].replace(/,/g, "");
-                
-                // If "paid to" is present and amount starts with "2", remove first digit
-                if (hasPaidTo && amountStr.startsWith("2")) {
-                  amountStr = amountStr.substring(1);
-                  console.log(`🔧 Detected "paid to" - corrected amount: ${rupeeMatch[1]} → ${amountStr}`);
-                }
-                
-                return parseFloat(amountStr);
-              }
-              
-              // Look for standalone numbers that could be amounts
-              const numberMatch = line.match(/^([\d,]+(?:\.\d{2})?)$/);
-              if (numberMatch) {
-                let amountStr = numberMatch[1].replace(/,/g, "");
-                const amount = parseFloat(amountStr);
-                
-                if (amount > 0 && amount < 1000000) {
-                  // If "paid to" is present and amount starts with "2", remove first digit
-                  if (hasPaidTo && amountStr.startsWith("2")) {
-                    amountStr = amountStr.substring(1);
-                    const correctedAmount = parseFloat(amountStr);
-                    console.log(`🔧 Detected "paid to" - corrected amount: ${numberMatch[1]} → ${amountStr}`);
-                    return correctedAmount;
-                  }
-                  return amount;
-                }
-              }
-            }
-            
-            return 0;
-          }
-
-          const amount = extractAmount(result.data.text)
-
-          // Convert date format
-          const isoDate = date ? new Date(date).toISOString().slice(0, 10) : ""
-
-          // Convert time format
-          let isoTime = ""
-          if (time) {
-            const [t, ampm] = time.split(" ")
-            let [h, m] = t.split(":").map(Number)
-            if (ampm === "pm" && h < 12) h += 12
-            if (ampm === "am" && h === 12) h = 0
-            isoTime = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`
-          }
-
-          const parsed = {
-            partyName,
-            amount,
-            date: isoDate,
-            time: isoTime,
-            count,
-            confidence: result.data.confidence,
-            amountDetected: amount > 0 ? "Yes" : "No",
-          }
-
-          console.log("📸 OCR Parsed Data:", parsed)
-
-          setProgress(100)
-          setParsedData(parsed)
-          setIsExpense(isExpense)
-        } catch (error) {
-          console.error("OCR processing failed:", error)
-          alert("OCR processing failed. Please try again.")
-        } finally {
-          setLoading(false)
-          setProgress(0)
-          setCurrentStep("")
+        // Update local state for display purposes
+        if (isExpenseType) {
+          setTo(extractedName);
+          setFrom('');
+        } else {
+          setFrom(extractedName);
+          setTo('');
         }
-      }
 
-      reader.readAsDataURL(normalizedBlob)
-    } catch (err) {
-      console.error("OCR Error:", err)
-      alert("OCR failed—please try a clearer screenshot or check your internet connection.")
+        console.log('✅ Parsed data with from/to fields:', parsed);
+      } else {
+        alert("OCR API failed: " + data.error);
+      }
+    } catch (error) {
+      console.error("OCR API error:", error);
+      alert("OCR API failed. Please try again.");
     } finally {
-      e.target.value = ""
+      setLoading(false);
+      setProgress(0);
+      setCurrentStep("");
+      e.target.value = ""; // reset file input
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-customLightGray dark:bg-customDarkBlue text-customIndigoDark font-segoe dark:text-custom1Blue transition-all">
@@ -399,12 +343,12 @@ const OCRUploader = () => {
                       )}
                     </button>
                     
-                    <input 
-                      ref={fileInputRef} 
-                      type="file" 
-                      accept="image/*" 
-                      className="hidden" 
-                      onChange={handleFileChange} 
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleFileChange}
                     />
                     
                     <p className="text-sm text-customIndigoDark/70 dark:text-custom1Blue/70">
@@ -509,11 +453,27 @@ const OCRUploader = () => {
         </main>
       </div>
 
+      {/* Debug info - remove in production */}
+      {parsedData && (
+        <div className="fixed bottom-4 right-4 bg-black/80 text-white p-4 rounded-lg text-xs max-w-sm">
+          <h4 className="font-bold mb-2">Debug - Parsed Data:</h4>
+          <pre>{JSON.stringify(parsedData, null, 2)}</pre>
+        </div>
+      )}
+
       {parsedData &&
         (isExpense ? (
-          <InputFormModal1 isOpen={true} onClose={() => setParsedData(null)} initialData={parsedData} />
+          <InputFormModal1 
+            isOpen={true} 
+            onClose={() => setParsedData(null)} 
+            initialData={parsedData} 
+          />
         ) : (
-          <InputFormModal isOpen={true} onClose={() => setParsedData(null)} initialData={parsedData} />
+          <InputFormModal 
+            isOpen={true} 
+            onClose={() => setParsedData(null)} 
+            initialData={parsedData} 
+          />
         ))}
     </div>
   )

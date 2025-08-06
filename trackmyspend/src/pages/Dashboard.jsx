@@ -100,7 +100,7 @@ function Dashboard() {
           return new Date(dateStr).getTime();
         };
         const allTxs = [...incomeTxs, ...expenseTxs].sort((a, b) => parseDateTime(b) - parseDateTime(a));
-        setRecentTransactions(allTxs.slice(0, 6)); // Show latest 6
+        setRecentTransactions(allTxs.slice(0, 5)); // Show latest 5
       } catch (err) {
         console.error("Dashboard fetch error:", err);
       } finally {
@@ -248,9 +248,6 @@ function Dashboard() {
                 <h2 className="text-xl font-bold text-customIndigoDark dark:text-customLavender">
                   Recent Transactions
                 </h2>
-                <button className="text-customBlue hover:text-customLavender transition-colors text-sm">
-                  View All
-                </button>
               </div>
               <div className="space-y-4">
                 {loading ? (

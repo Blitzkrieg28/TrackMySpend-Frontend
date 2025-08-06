@@ -36,12 +36,12 @@ export function Navbar1({onGetstarted, onGetstarted2}){
                         transition={{ delay: 0.3, duration: 0.6 }}
                         className="flex items-center space-x-4"
                     >
-                        <button 
+                        {/* <button 
                             onClick={onGetstarted}
                             className="px-6 py-2 text-customIndigoDark dark:text-custom1Blue hover:text-customBlue dark:hover:text-custom1Blue transition-colors font-medium"
                         >
                             Sign In
-                        </button>
+                        </button> */}
                         <Button label="Get Started" trynow={onGetstarted2} />
                     </motion.div>
                 </div>

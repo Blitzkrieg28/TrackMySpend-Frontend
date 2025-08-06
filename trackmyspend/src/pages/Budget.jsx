@@ -14,7 +14,11 @@ import ProgressBar from "../components/ProgressBar"
 export default function Budget() {
   const [showSplash, setShowSplash] = useState(false)
   const [totalIncome, setTotalIncome] = useState(null)
-  const [value, setValue] = useState(50) // slider %
+  const [value, setValue] = useState(() => {
+    // Read from localStorage on mount
+    const stored = localStorage.getItem("trackmyspend-budget-allocation");
+    return stored !== null ? Number(stored) : 50;
+  }); // slider %
   const [collapsed, setCollapsed] = useState(true) // collapsed?
 
   const navigate = useNavigate()
@@ -133,7 +137,10 @@ export default function Budget() {
                       {/* Set Button */}
                       <div className="flex justify-center pt-4">
                         <button
-                          onClick={() => setCollapsed(true)}
+                          onClick={() => {
+                            localStorage.setItem("trackmyspend-budget-allocation", value);
+                            setCollapsed(true);
+                          }}
                           className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-300 hover:scale-105 flex items-center gap-3"
                         >
                           <Check className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />

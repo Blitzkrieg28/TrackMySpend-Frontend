@@ -18,7 +18,7 @@ import AnalysisForRep from "../components/AnalysisforRep";
 
 export default function RepAnalysis(){
 const location = useLocation();
-  const { month } = location.state || {};
+  const { month, year, week } = location.state || {};
 
   return (
    <div className="min-h-screen flex flex-col bg-[#e8e8e8] dark:bg-customDarkBlue text-customIndigoDark font-segoe dark:text-custom1Blue transition-all">
@@ -34,7 +34,7 @@ const location = useLocation();
 
       <div className=" p-4 sm:p-6 w-full  min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="w-full max-w-7xl"></div>
-      <AnalysisForRep month= {month}/>
+      <AnalysisForRep month={month} year={year} week={week}/>
       </div>
 
       </div>

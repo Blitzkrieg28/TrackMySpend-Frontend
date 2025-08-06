@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { TypeAnimation } from 'react-type-animation';
 
-export default function InputForRep({ isOpen, onClose }) {
+export default function InputForMonthlyReport({ isOpen, onClose }) {
   const navigate = useNavigate();
   const [showButton, setShowButton] = useState(false);
   const [month, setMonth] = useState("");
@@ -34,7 +34,7 @@ export default function InputForRep({ isOpen, onClose }) {
 
         <div className="flex justify-start pb-4">
           <TypeAnimation
-            sequence={['Manually enter the info!!..']}
+            sequence={['Select a month to view your monthly report!']}
             wrapper="p"
             cursor={true}
             repeat={0}
@@ -75,7 +75,7 @@ export default function InputForRep({ isOpen, onClose }) {
         </div>
 
         <TypeAnimation
-          sequence={['Do you want report for this month?..', () => setShowButton(true)]}
+          sequence={['Or get the report for the current month!', () => setShowButton(true)]}
           wrapper="p"
           cursor={true}
           repeat={0}
@@ -87,7 +87,7 @@ export default function InputForRep({ isOpen, onClose }) {
             onClick={handleCurrentMonthReport}
             className="dark:bg-customLavender bg-[#8e8e8e] text-white px-4 py-2 rounded hover:bg-[#737373] hover:dark:bg-[#825ec9]"
           >
-            Get Report
+            Get Current Month Report
           </button>
         )}
       </motion.div>

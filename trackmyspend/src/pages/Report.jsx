@@ -13,9 +13,12 @@ import icon1 from "../assets/graph.png";
 import icon2 from "../assets/checklist.png"
 import InputFormModal from "../components/InputFormModal";
 import IncomeListCard from "../components/IncomeList";
-import InputForRep from "../components/InputforRep";
-import InputForRep1 from "../components/InputForRep1";
-export default function Income(){
+import InputForMonthlyReport from "../components/InputforRep";
+import InputForTotalReport from "../components/InputForRep1";
+import InputForWeeklyReport from "../components/InputForRep2";
+import InputForYearlyReport from "../components/InputForRep3";
+
+export default function ReportPage(){
 const [showSplash,setShowSplash]= useState(false);
 const [showIncomeList,setShowIncomeList]= useState(false);
  const dummyData = [
@@ -31,27 +34,9 @@ const handlestart5 = (link) => {
   }, 3000);
 };
 
- const [showModal, setShowModal] = useState(false);
- const [showModal1, setShowModal1] = useState(false);
- const [showModal2, setShowModal2] = useState(false);
- const [showModal3, setShowModal3] = useState(false);
-
-
-  const handleImageClick = () => {
-    setShowModal(!showModal);
-  };
-   const handleImageClick1 = () => {
-    setShowModal1(!showModal1);
-  };
-   const handleImageClick2 = () => {
-    setShowModal2(!showModal2);
-  };
-   const handleImageClick3 = () => {
-    setShowModal3(!showModal3);
-  };
-  
-
-  
+ const [showMonthly, setShowMonthly] = useState(false);
+ const [showYearly, setShowYearly] = useState(false);
+ const [showTotal, setShowTotal] = useState(false);
 
   if(showSplash) return <Splash/>
   return (
@@ -106,35 +91,25 @@ const handlestart5 = (link) => {
   {/* Horizontal Line in Center */}
   <div className="absolute inset-x-0 top-1/2 h-px bg-[#8e8e8e] transform -translate-y-1/2"></div>
 
-  {/* Top Left */}
-  <div className="text-center cursor-pointer" onClick={handleImageClick}>
-    <img src={icon1} alt="Add Income" className="w-16 h-16 mx-auto" />
+  {/* Top Left: Monthly Report */}
+  <div className="text-center cursor-pointer" onClick={() => setShowMonthly(true)}>
+    <img src={icon1} alt="Monthly Report" className="w-16 h-16 mx-auto" />
     <p className="mt-2 text-sm text-gray-600 dark:text-customLavender">Monthly Report</p>
-    <InputForRep isOpen={showModal} onClose={() => setShowModal(!showModal)} />
+    <InputForMonthlyReport isOpen={showMonthly} onClose={() => setShowMonthly(false)} />
   </div>
 
-  {/* Top Right */}
-  <div className="text-center cursor-pointer" onClick={handleImageClick1}>
-    <img src={icon2} alt="View Incomes" className="w-16 h-16 mx-auto" />
-    <p className="mt-2 text-sm text-gray-600 dark:text-customLavender">View Incomes</p>
-      <InputForRep1 isOpen={showModal1} onClose={() => setShowModal1(!showModal1)} />
-
+  {/* Bottom Left: Yearly Report */}
+  <div className="text-center cursor-pointer" onClick={() => setShowYearly(true)}>
+    <img src={icon1} alt="Yearly Report" className="w-16 h-16 mx-auto" />
+    <p className="mt-2 text-sm text-gray-600 dark:text-customLavender">Yearly Report</p>
+    <InputForYearlyReport isOpen={showYearly} onClose={() => setShowYearly(false)} />
   </div>
 
-  {/* Bottom Left */}
-  <div className="text-center cursor-pointer" onClick={handleImageClick2}>
-    <img src="#" alt="Option 3" className="w-16 h-16 mx-auto" />
-    <p className="mt-2 text-sm text-gray-600 dark:text-customLavender">Option 3</p>
-        <InputForRep isOpen={showModal2} onClose={() => setShowModal2(!showModal2)} />
-
-  </div>
-
-  {/* Bottom Right */}
-  <div className="text-center cursor-pointer" onClick={handleImageClick3}>
-    <img src="#" alt="Option 4" className="w-16 h-16 mx-auto" />
-    <p className="mt-2 text-sm text-gray-600 dark:text-customLavender">Option 4</p>
-          <InputForRep isOpen={showModal3} onClose={() => setShowModal3(!showModal3)} />
-
+  {/* Bottom Right: Total Report */}
+  <div className="text-center cursor-pointer" onClick={() => setShowTotal(true)}>
+    <img src={icon2} alt="Total Report" className="w-16 h-16 mx-auto" />
+    <p className="mt-2 text-sm text-gray-600 dark:text-customLavender">Total Report</p>
+    <InputForTotalReport isOpen={showTotal} onClose={() => setShowTotal(false)} />
   </div>
 </div>
 

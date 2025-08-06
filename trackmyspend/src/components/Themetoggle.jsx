@@ -2,11 +2,16 @@ import { useEffect, useState } from "react";
 import { FaMoon, FaSun } from "react-icons/fa";
 
 export default function ThemeToggle() {
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(() => {
+    // Read from localStorage on mount
+    const stored = localStorage.getItem("trackmyspend-darkmode");
+    return stored === null ? false : stored === "true";
+  });
 
-  // Sync HTML class
+  // Sync HTML class and persist to localStorage
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
+    localStorage.setItem("trackmyspend-darkmode", dark);
   }, [dark]);
 
   return (
@@ -34,10 +39,6 @@ export default function ThemeToggle() {
           ${dark ? "translate-x-8 bg-customLavender" : "translate-x-0 bg-customNearWhite"}
         `}
       />
-
-
-      
-      
     </label>
   );
 }

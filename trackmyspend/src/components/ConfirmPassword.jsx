@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { HiEye, HiEyeOff } from "react-icons/hi";
 
-export function ConfirmPasswordInput({ password }) {
-  const [confirmPassword, setConfirmPassword] = useState("");
+export function ConfirmPasswordInput({ password, confirmPassword, setConfirmPassword }) {
   const [confirmTouched, setConfirmTouched] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -55,15 +54,18 @@ export function ConfirmPasswordInput({ password }) {
       <div className={`text-lg pb-2  ${labelcolor}`}>Re-enter Password</div>
       <div className="relative flex items-center gap-4 ">
         {/* Left Icon */}
-        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-          <HiEye className="w-5 h-5" />
+        <span 
+          className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 cursor-pointer"
+          onClick={() => setShowPassword(!showPassword)}
+        >
+          {showPassword ? <HiEyeOff className="w-5 h-5" /> : <HiEye className="w-5 h-5" />}
         </span>
 
         <input
           id="confirmPassword"
           type={showPassword ? "text" : "password"}
           placeholder="Enter your password"
-          value={confirmPassword}
+          value={confirmPassword || ""}
           onBlur={() => setConfirmTouched(true)}
           onInput={(e) => setConfirmPassword(e.target.value)}
           className={`font-segoe pl-10 pr-10 p-2.5 w-full text-sm rounded-lg shadow-sm border ${inputBorder}`}

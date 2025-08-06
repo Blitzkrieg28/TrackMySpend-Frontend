@@ -14,8 +14,12 @@ import {
   HiDocumentReport,
   HiArrowRight,
   HiCheckCircle,
-  HiStar
+  HiStar,
+  HiCamera,
+  HiDocumentText,
+  HiEye
 } from "react-icons/hi";
+import { FaFileAlt } from "react-icons/fa";
 
 export default function Landing() {
     const navigate = useNavigate();
@@ -33,7 +37,7 @@ export default function Landing() {
     const handlestart2 = function() {
         setShowSplash(true);
         setTimeout(() => {
-            navigate("/signup");
+            navigate("/dashboard");
         }, 3000);
     }
     
@@ -69,6 +73,12 @@ export default function Landing() {
             title: "Smart Reminders",
             description: "Never miss a payment with intelligent notification system",
             color: "bg-custom1Blue"
+        },
+        {
+            icon: FaFileAlt,
+            title: "Auto-filling",
+            description: "OCR-powered receipt scanning that automatically extracts and fills transaction details from your receipts",
+            color: "bg-customPurple"
         }
     ];
 
@@ -125,21 +135,11 @@ export default function Landing() {
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
                         {/* Left Content */}
                         <motion.div
-                            initial={{ opacity: 0, x: -50 }}
-                            animate={{ opacity: 1, x: 0 }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
                             transition={{ duration: 0.8, ease: "easeOut" }}
                             className="space-y-8"
                         >
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.2, duration: 0.6 }}
-                                className="inline-flex items-center px-4 py-2 bg-customBlue text-white rounded-full text-sm font-medium"
-                            >
-                                <HiStar className="w-4 h-4 mr-2" />
-                                #1 Personal Finance App
-                            </motion.div>
-
                             <motion.h1
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -168,43 +168,20 @@ export default function Landing() {
                                 transition={{ delay: 0.5, duration: 0.6 }}
                                 className="flex flex-col sm:flex-row gap-4"
                             >
-                                <Button label="Get Started Free" trynow={handlestart2} />
+                                <Button label="Get Started " trynow={handlestart2} />
                                 <button className="flex items-center gap-2 px-6 py-3 text-customIndigoDark dark:text-custom1Blue hover:text-customBlue dark:hover:text-custom1Blue transition-colors">
                                     <span>Watch Demo</span>
                                     <HiArrowRight className="w-5 h-5" />
                                 </button>
                             </motion.div>
 
-                            {/* Stats */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.6, duration: 0.6 }}
-                                className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-8"
-                            >
-                                {stats.map((stat, index) => (
-                                    <motion.div
-                                        key={index}
-                                        initial={{ opacity: 0, scale: 0.8 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        transition={{ delay: 0.7 + index * 0.1, duration: 0.5 }}
-                                        className="text-center"
-                                    >
-                                        <div className="text-2xl lg:text-3xl font-bold text-customIndigoDark dark:text-custom1Blue">
-                                            {stat.number}
-                                        </div>
-                                        <div className="text-sm text-customIndigoDark/70 dark:text-custom1Blue/70">
-                                            {stat.label}
-                                        </div>
-                                    </motion.div>
-                                ))}
-                            </motion.div>
+                          
                         </motion.div>
 
                         {/* Right Content - Image */}
                         <motion.div
-                            initial={{ opacity: 0, x: 50 }}
-                            animate={{ opacity: 1, x: 0 }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
                             transition={{ delay: 0.3, duration: 0.8 }}
                             className="relative"
                         >
@@ -272,35 +249,6 @@ export default function Landing() {
                             </motion.div>
                         ))}
                     </div>
-                </div>
-            </section>
-
-            {/* CTA Section */}
-            <section className="relative py-20 px-6">
-                <div className="max-w-4xl mx-auto text-center">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8 }}
-                        className="bg-customBlue rounded-3xl p-12 relative overflow-hidden"
-                    >
-                        <div className="absolute inset-0 bg-customBlue/20"></div>
-                        <div className="relative z-10">
-                            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
-                                Ready to take control of your finances?
-                            </h2>
-                            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-                                Join thousands of users who have already transformed their financial lives with TrackMySpend
-                            </p>
-                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                                <Button label="Start Free Trial" trynow={handlestart2} />
-                                <button className="px-8 py-3 border-2 border-white text-white rounded-lg hover:bg-white hover:text-customBlue transition-colors">
-                                    Learn More
-                                </button>
-                            </div>
-                        </div>
-                    </motion.div>
                 </div>
             </section>
 

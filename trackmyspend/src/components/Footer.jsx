@@ -62,12 +62,9 @@ export function FooterComponent() {
         {/* Copyright */}
         <p className="text-sm text-gray-500 dark:text-gray-400">
           © 2025{" "}
-          <a
-            href="#"
-            className="hover:underline"
-          >
-            TrackMySpend™
-          </a>
+          
+            Made with ❤️ by <a href="https://github.com/Blitzkrieg28" className="hover:underline">Blitzkreig28</a>
+          
           . All Rights Reserved.
         </p>
       </div>

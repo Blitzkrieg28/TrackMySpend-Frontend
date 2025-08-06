@@ -30,34 +30,83 @@ const customColors = {
   darkGridColor: "rgba(156, 163, 175, 0.1)",
 }
 
-export default function LineGraphForRep({ month }) {
+export default function LineGraphForRep({ month, year, week }) {
   const [chartData, setChartData] = useState(null)
   const [options, setOptions] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  // Determine report type
+  let reportType = "total"
+  if (month) reportType = "monthly"
+  else if (year && week) reportType = "weekly"
+  else if (year) reportType = "yearly"
+
   useEffect(() => {
-    if (!month) return
-
-    const [year, mon] = month.split("-")
-    const incomeUrl = `https://trackmyspendapi-3.onrender.com/income/eachweekincome?year=${year}&month=${mon}`
-    const expenseUrl = `https://trackmyspendapi-3.onrender.com/expense/eachweekexpense?year=${year}&month=${mon}`
-
+    let incomeUrl = ""
+    let expenseUrl = ""
+    let labelsKey = ""
+    let incomeLabel = ""
+    let expenseLabel = ""
     setLoading(true)
+
+    if (reportType === "monthly") {
+      const [y, m] = month.split("-")
+      incomeUrl = `https://trackmyspendapi-3.onrender.com/income/eachweekincome?year=${y}&month=${m}`
+      expenseUrl = `https://trackmyspendapi-3.onrender.com/expense/eachweekexpense?year=${y}&month=${m}`
+      labelsKey = "weeks"
+      incomeLabel = "Weekly Income"
+      expenseLabel = "Weekly Expense"
+    } else if (reportType === "weekly") {
+      incomeUrl = `https://trackmyspendapi-3.onrender.com/income/eachdayincome?year=${year}&week=${week}`
+      expenseUrl = `https://trackmyspendapi-3.onrender.com/expense/eachdayexpense?year=${year}&week=${week}`
+      labelsKey = "days"
+      incomeLabel = "Daily Income"
+      expenseLabel = "Daily Expense"
+    } else if (reportType === "yearly") {
+      incomeUrl = `https://trackmyspendapi-3.onrender.com/income/eachmonthincome?year=${year}`
+      expenseUrl = `https://trackmyspendapi-3.onrender.com/expense/eachmonthexpense?year=${year}`
+      labelsKey = "months"
+      incomeLabel = "Monthly Income"
+      expenseLabel = "Monthly Expense"
+    } else {
+      // total
+      incomeUrl = `https://trackmyspendapi-3.onrender.com/income/eachyearincome`
+      expenseUrl = `https://trackmyspendapi-3.onrender.com/expense/eachyearexpense`
+      labelsKey = "years"
+      incomeLabel = "Yearly Income"
+      expenseLabel = "Yearly Expense"
+    }
+
     axios
       .all([axios.get(incomeUrl), axios.get(expenseUrl)])
       .then(
         axios.spread((incRes, expRes) => {
           const rawInc = incRes.data
           const rawExp = expRes.data
-          const labels = rawInc.weeks
-          const incTotals = rawInc.totals
-          const expTotals = rawExp.totals
-
+          let labels = rawInc[labelsKey]
+          if (!labels && rawInc.labels) labels = rawInc.labels;
+          if (!labels && reportType === "yearly") labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+          if (!labels && reportType === "monthly") labels = ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"];
+          if (!labels && reportType === "weekly") labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+          // Debug log for all
+          let incTotals = Array.isArray(rawInc.totals) ? rawInc.totals : [];
+          let expTotals = Array.isArray(rawExp.totals) ? rawExp.totals : [];
+          // Pad or trim to match labels length
+          if (labels && Array.isArray(labels)) {
+            if (incTotals.length < labels.length) incTotals = [...incTotals, ...Array(labels.length - incTotals.length).fill(0)];
+            if (incTotals.length > labels.length) incTotals = incTotals.slice(0, labels.length);
+            if (expTotals.length < labels.length) expTotals = [...expTotals, ...Array(labels.length - expTotals.length).fill(0)];
+            if (expTotals.length > labels.length) expTotals = expTotals.slice(0, labels.length);
+          }
+          if (labels && (labels.length !== incTotals.length || labels.length !== expTotals.length)) {
+            console.warn("LineGraphForRep: Mismatch between labels and data", { labels, incTotals, expTotals });
+          }
+          console.log("LineGraphForRep API response:", { reportType, rawInc, rawExp, labels, incTotals, expTotals });
           setChartData({
             labels,
             datasets: [
               {
-                label: "Weekly Income",
+                label: incomeLabel,
                 data: incTotals,
                 borderColor: customColors.income,
                 backgroundColor: customColors.incomeGradient,
@@ -71,7 +120,7 @@ export default function LineGraphForRep({ month }) {
                 borderWidth: 3,
               },
               {
-                label: "Weekly Expense",
+                label: expenseLabel,
                 data: expTotals,
                 borderColor: customColors.expense,
                 backgroundColor: customColors.expenseGradient,
@@ -90,10 +139,10 @@ export default function LineGraphForRep({ month }) {
         }),
       )
       .catch((err) => {
-        console.error("Error fetching weekly data:", err)
+        console.error("Error fetching chart data:", err)
         setLoading(false)
       })
-  }, [month])
+  }, [month, year, week, reportType])
 
   useEffect(() => {
     setOptions({
@@ -147,7 +196,14 @@ export default function LineGraphForRep({ month }) {
           },
           title: {
             display: true,
-            text: "Week",
+            text:
+              reportType === "monthly"
+                ? "Week"
+                : reportType === "weekly"
+                ? "Day"
+                : reportType === "yearly"
+                ? "Month"
+                : "Year",
             color: customColors.grayText,
             font: {
               size: 12,
@@ -189,7 +245,7 @@ export default function LineGraphForRep({ month }) {
         },
       },
     })
-  }, [])
+  }, [reportType])
 
   if (loading) {
     return (
@@ -204,11 +260,11 @@ export default function LineGraphForRep({ month }) {
 
   return (
     <div className="w-full h-full">
-      {chartData && options ? (
+      {chartData && options && chartData.labels && chartData.labels.length > 0 && chartData.datasets && chartData.datasets[0].data.length > 0 ? (
         <Line data={chartData} options={options} />
-      ) : (
+      ) : loading ? null : (
         <div className="w-full h-full flex items-center justify-center">
-          <p className="text-sm text-gray-500 dark:text-gray-400">No data available</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">No data available for this period.</p>
         </div>
       )}
     </div>

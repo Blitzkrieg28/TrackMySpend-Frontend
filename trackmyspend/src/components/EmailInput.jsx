@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { HiMail } from "react-icons/hi";
 
-export default function EmailInput() {
-  const [email, setEmail] = useState("");
+export default function EmailInput({ email, setEmail }) {
   const [touched, setTouched] = useState(false);
 
-  const isValid = email.includes("@");
+  const isValid = email && email.includes("@");
 
   // Label Color
   let labelColor = "text-gray-700";
@@ -61,7 +60,7 @@ export default function EmailInput() {
             id="email"
             type="email"
             placeholder="name@example.com"
-            value={email}
+            value={email || ""}
             
             onBlur={() => setTouched(true)}
             onInput={(e) => setEmail(e.target.value)}

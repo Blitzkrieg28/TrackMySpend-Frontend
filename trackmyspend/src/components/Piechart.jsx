@@ -26,19 +26,35 @@ const customColors = {
   ],
 }
 
-export function PieChartForRep({ month }) {
+export function PieChartForRep({ month, year, week }) {
   const [chartData, setChartData] = useState(null)
   const [options, setOptions] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (!month) return
+  // Determine report type
+  let reportType = "total"
+  if (month) reportType = "monthly"
+  else if (year && week) reportType = "weekly"
+  else if (year) reportType = "yearly"
 
-    const [year, mon] = month.split("-")
+  useEffect(() => {
+    let url = ""
     setLoading(true)
 
+    if (reportType === "monthly") {
+      const [y, m] = month.split("-")
+      url = `https://trackmyspendapi-3.onrender.com/category/by-category?year=${y}&month=${m}`
+    } else if (reportType === "weekly") {
+      url = `https://trackmyspendapi-3.onrender.com/category/by-category?year=${year}&week=${week}`
+    } else if (reportType === "yearly") {
+      url = `https://trackmyspendapi-3.onrender.com/category/by-category?year=${year}`
+    } else {
+      // total
+      url = `https://trackmyspendapi-3.onrender.com/category/by-category`
+    }
+
     axios
-      .get(`https://trackmyspendapi-3.onrender.com/category/by-category?year=${year}&month=${mon}`)
+      .get(url)
       .then(({ data }) => {
         const { categories, totals } = data
 
@@ -61,7 +77,7 @@ export function PieChartForRep({ month }) {
         console.error("Error fetching categories:", err)
         setLoading(false)
       })
-  }, [month])
+  }, [month, year, week, reportType])
 
   useEffect(() => {
     setOptions({
@@ -129,7 +145,7 @@ export function PieChartForRep({ month }) {
         },
       },
     })
-  }, [])
+  }, [reportType])
 
   if (loading) {
     return (
